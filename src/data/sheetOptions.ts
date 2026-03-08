@@ -53,6 +53,34 @@ export const PAPER_SIZE_OPTIONS: PaperSizeOption[] = [
   { id: 'letter', label: 'Letter' },
 ]
 
+export const ROWS_PER_CHARACTER_OPTIONS = [
+  { value: 1, label: '1 row' },
+  { value: 2, label: '2 rows' },
+  { value: 3, label: '3 rows' },
+  { value: 4, label: '4 rows' },
+  { value: 5, label: '5 rows' },
+  { value: 6, label: '6 rows' },
+  { value: 7, label: '7 rows' },
+  { value: 8, label: '8 rows' },
+]
+
+export const GHOST_COPIES_OPTIONS = [
+  { value: 1, label: '1 copy' },
+  { value: 2, label: '2 copies' },
+  { value: 3, label: '3 copies' },
+  { value: 4, label: '4 copies' },
+  { value: 5, label: '5 copies' },
+  { value: 6, label: '6 copies' },
+]
+
+export const FONT_FAMILY_MAP: Record<string, string> = {
+  'noto-sans-thai': '"Noto Sans Thai", sans-serif',
+  'noto-sans-thai-looped': '"Noto Sans Thai Looped", sans-serif',
+  'noto-serif-thai': '"Noto Serif Thai", serif',
+  'mali': '"Mali", cursive',
+  'playpen-sans-thai': '"Playpen Sans", cursive',
+}
+
 const defaultFont = FONT_OPTIONS.find((f) => f.isDefault)!
 
 export const DEFAULT_SHEET_CONFIG: SheetConfig = {

@@ -51,8 +51,8 @@ describe('Preview', () => {
       />
     )
     region = screen.getByRole('region', { name: /preview/i })
-    expect(region).not.toHaveTextContent(THAI_CONSONANTS[0].char)
-    expect(region).toHaveTextContent(THAI_CONSONANTS[1].char)
+    expect(region).not.toHaveTextContent(`${THAI_CONSONANTS[0].char}อ ${THAI_CONSONANTS[0].name}`)
+    expect(region).toHaveTextContent(`${THAI_CONSONANTS[1].char}อ ${THAI_CONSONANTS[1].name}`)
   })
 
   it('reflects rows per character in structure', () => {

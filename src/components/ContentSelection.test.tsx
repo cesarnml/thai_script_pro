@@ -23,7 +23,7 @@ describe('ContentSelection', () => {
     expect(summary).toBeInTheDocument()
 
     const firstConsonant = THAI_CONSONANTS[0]
-    const button = screen.getByRole('button', { name: new RegExp(firstConsonant.char) })
+    const button = screen.getByRole('button', { name: new RegExp(`^${firstConsonant.char}`) })
     await user.click(button)
 
     expect(screen.getByText(/1 consonants?/i)).toBeInTheDocument()

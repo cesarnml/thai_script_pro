@@ -6,3 +6,31 @@
   font-family: system-ui, sans-serif;
   line-height: 1.5;
 }
+
+.guide-lines-thai {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(#c8e6c9, #c8e6c9) 0 25% / 100% 1px no-repeat,
+    linear-gradient(#c8e6c9, #c8e6c9) 0 50% / 100% 1px no-repeat,
+    linear-gradient(#c8e6c9, #c8e6c9) 0 75% / 100% 1px no-repeat;
+}
+
+.guide-lines-cross {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(#e0e0e0, #e0e0e0) 0 50% / 100% 1px no-repeat,
+    linear-gradient(#e0e0e0, #e0e0e0) 50% 0 / 1px 100% no-repeat;
+}
+
+.guide-lines-sandwich {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(#e0e0e0, #e0e0e0) 0 25% / 100% 1px no-repeat,
+    linear-gradient(#e0e0e0, #e0e0e0) 0 75% / 100% 1px no-repeat;
+}

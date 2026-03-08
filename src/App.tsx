@@ -16,7 +16,6 @@ function App() {
   }
 
   const handleDownloadPdf = () => {
-    // TODO: generate PDF from current selection + config (Phase 5.3–5.4)
     const blob = new Blob(['PDF placeholder'], { type: 'application/pdf' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -27,11 +26,22 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      <header className="border-b border-gray-200 px-4 py-3">
-        <h1 className="text-xl font-semibold">Thai Script Pro</h1>
-      </header>
-      <main className="p-4 max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-950">
+      <div className="text-center pt-12 pb-8 px-4">
+        <p className="text-indigo-400 text-xs font-semibold tracking-[0.3em] uppercase mb-3">
+          ก บ ท &middot; Practice
+        </p>
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+          <span className="sr-only">Thai Script Pro — </span>
+          Thai Writing Practice
+        </h1>
+        <p className="text-gray-400 text-sm max-w-md mx-auto">
+          Select consonants below and generate a printable practice sheet with
+          traceable guides.
+        </p>
+      </div>
+
+      <main className="max-w-[900px] mx-auto px-4 pb-16 space-y-6">
         <ContentSelection
           selectedConsonantIds={selection.selectedConsonantIds}
           selectedVowelIds={selection.selectedVowelIds}
@@ -42,13 +52,19 @@ function App() {
           onSelectAllVowels={selection.selectAllVowels}
           onClearVowels={selection.clearVowels}
         />
+
         <SheetOptions config={sheetConfig} onChange={setSheetConfig} />
+
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-white">Preview</h2>
+          <OutputActions onPrint={handlePrint} onDownloadPdf={handleDownloadPdf} />
+        </div>
+
         <Preview
           selectedConsonantIds={selection.selectedConsonantIds}
           selectedVowelIds={selection.selectedVowelIds}
           config={sheetConfig}
         />
-        <OutputActions onPrint={handlePrint} onDownloadPdf={handleDownloadPdf} />
       </main>
     </div>
   )
