@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import html2pdf from 'html2pdf.js'
 import { ContentSelection } from './components/ContentSelection'
 import { SheetOptions } from './components/SheetOptions'
 import { Preview } from './components/Preview'
@@ -10,19 +11,27 @@ import type { SheetConfig } from './data/sheetOptions'
 function App() {
   const selection = useContentSelection()
   const [sheetConfig, setSheetConfig] = useState<SheetConfig>(DEFAULT_SHEET_CONFIG)
+  const previewRef = useRef<HTMLDivElement>(null)
 
   const handlePrint = () => {
     window.print()
   }
 
   const handleDownloadPdf = () => {
-    const blob = new Blob(['PDF placeholder'], { type: 'application/pdf' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'thai-script-practice.pdf'
-    a.click()
-    URL.revokeObjectURL(url)
+    const el = previewRef.current
+    if (!el) return
+
+    html2pdf()
+      .set({
+        margin: [10, 10],
+        filename: 'thai-script-practice.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: sheetConfig.paperSize, orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+      })
+      .from(el)
+      .save()
   }
 
   return (
@@ -60,11 +69,13 @@ function App() {
           <OutputActions onPrint={handlePrint} onDownloadPdf={handleDownloadPdf} />
         </div>
 
-        <Preview
-          selectedConsonantIds={selection.selectedConsonantIds}
-          selectedVowelIds={selection.selectedVowelIds}
-          config={sheetConfig}
-        />
+        <div ref={previewRef}>
+          <Preview
+            selectedConsonantIds={selection.selectedConsonantIds}
+            selectedVowelIds={selection.selectedVowelIds}
+            config={sheetConfig}
+          />
+        </div>
       </main>
     </div>
   )

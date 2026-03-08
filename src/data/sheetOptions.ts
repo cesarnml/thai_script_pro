@@ -43,9 +43,9 @@ export const FONT_OPTIONS: FontOption[] = [
 ]
 
 export const FONT_SIZE_OPTIONS: FontSizeOption[] = [
-  { id: 'small', label: 'Small (18pt)' },
-  { id: 'medium', label: 'Medium (24pt)' },
-  { id: 'large', label: 'Large (32pt)' },
+  { id: 'small', label: 'Small (24pt)' },
+  { id: 'medium', label: 'Medium (36pt)' },
+  { id: 'large', label: 'Large (48pt)' },
 ]
 
 export const PAPER_SIZE_OPTIONS: PaperSizeOption[] = [
@@ -72,6 +72,12 @@ export const GHOST_COPIES_OPTIONS = [
   { value: 5, label: '5 copies' },
   { value: 6, label: '6 copies' },
 ]
+
+export const FONT_SIZE_MAP: Record<string, { text: number; cellPx: number }> = {
+  small: { text: 24, cellPx: 48 },
+  medium: { text: 36, cellPx: 64 },
+  large: { text: 48, cellPx: 80 },
+}
 
 export const FONT_FAMILY_MAP: Record<string, string> = {
   'noto-sans-thai': '"Noto Sans Thai", sans-serif',

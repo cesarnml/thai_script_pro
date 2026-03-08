@@ -1,7 +1,7 @@
 import type { SheetConfig } from '../data/sheetOptions'
 import { THAI_CONSONANTS } from '../data/consonants'
 import { THAI_VOWELS } from '../data/vowels'
-import { FONT_OPTIONS, FONT_FAMILY_MAP } from '../data/sheetOptions'
+import { FONT_OPTIONS, FONT_FAMILY_MAP, FONT_SIZE_MAP } from '../data/sheetOptions'
 
 interface PreviewProps {
   selectedConsonantIds: string[]
@@ -28,48 +28,94 @@ function PracticeGrid({
   config: SheetConfig
 }) {
   const totalCols = config.ghostCopiesPerRow + 4
+  const sz = FONT_SIZE_MAP[config.fontSize] || FONT_SIZE_MAP.medium
+
+  const cellStyle: React.CSSProperties = {
+    width: sz.cellPx,
+    height: sz.cellPx,
+    position: 'relative',
+    border: '1px solid #d1d5db',
+  }
+
+  const charStyle: React.CSSProperties = {
+    position: 'absolute',
+    inset: 0,
+    width: sz.cellPx,
+    height: sz.cellPx,
+    zIndex: 1,
+  }
 
   return (
-    <table className="border-collapse">
-      <tbody>
-        {Array.from({ length: config.rowsPerCharacter }).map((_, row) => (
-          <tr key={row}>
-            {Array.from({ length: totalCols }).map((_, col) => {
-              const isFirstRow = row === 0
-              const isModel = isFirstRow && col === 0
-              const ghostIdx = isFirstRow ? col - 1 : col
-              const isGhost = isFirstRow
-                ? col > 0 && col <= config.ghostCopiesPerRow
-                : col < config.ghostCopiesPerRow
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${totalCols}, ${sz.cellPx}px)`,
+      }}
+    >
+      {Array.from({ length: config.rowsPerCharacter }).map((_, row) =>
+        Array.from({ length: totalCols }).map((_, col) => {
+          const isFirstRow = row === 0
+          const isModel = isFirstRow && col === 0
+          const ghostIdx = isFirstRow ? col - 1 : col
+          const isGhost = isFirstRow
+            ? col > 0 && col <= config.ghostCopiesPerRow
+            : col < config.ghostCopiesPerRow
 
-              return (
-                <td
-                  key={col}
-                  className="border border-gray-300 w-14 h-14 text-center align-middle relative"
+          return (
+            <div key={`${row}-${col}`} style={cellStyle}>
+              <GuideLines guide={config.gridGuide} />
+              {isModel && (
+                <svg
+                  aria-hidden="true"
+                  style={charStyle}
+                  width={sz.cellPx}
+                  height={sz.cellPx}
+                  viewBox={`0 0 ${sz.cellPx} ${sz.cellPx}`}
                 >
-                  <GuideLines guide={config.gridGuide} />
-                  {isModel && (
-                    <span className="text-3xl font-semibold relative z-10">
-                      {char}
-                    </span>
-                  )}
-                  {isGhost && (
-                    <span
-                      className="text-3xl relative z-10 text-gray-400"
-                      style={{
-                        opacity: getGhostOpacity(ghostIdx, config.ghostCopiesPerRow),
-                      }}
-                    >
-                      {char}
-                    </span>
-                  )}
-                </td>
-              )
-            })}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={sz.text}
+                    fontWeight={600}
+                    fontFamily="inherit"
+                    fill="currentColor"
+                  >
+                    {char}
+                  </text>
+                </svg>
+              )}
+              {isGhost && (
+                <svg
+                  aria-hidden="true"
+                  style={{
+                    ...charStyle,
+                    color: '#9ca3af',
+                    opacity: getGhostOpacity(ghostIdx, config.ghostCopiesPerRow),
+                  }}
+                  width={sz.cellPx}
+                  height={sz.cellPx}
+                  viewBox={`0 0 ${sz.cellPx} ${sz.cellPx}`}
+                >
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={sz.text}
+                    fontFamily="inherit"
+                    fill="currentColor"
+                  >
+                    {char}
+                  </text>
+                </svg>
+              )}
+            </div>
+          )
+        })
+      )}
+    </div>
   )
 }
 

@@ -1,0 +1,19 @@
+---
+description: Always use pnpm as the package manager
+alwaysApply: true
+---
+
+# Package Manager
+
+ALWAYS use `pnpm` for installing, removing, and managing dependencies. Never use `npm` or `yarn`.
+
+```bash
+# ✅ GOOD
+pnpm install
+pnpm add <package>
+pnpm remove <package>
+
+# ❌ BAD
+npm install
+yarn add <package>
+```
