@@ -74,7 +74,8 @@ describe('COLUMNS_OPTIONS', () => {
 
 describe('GHOST_COPIES_OPTIONS', () => {
   it('supports up to 10 copies', () => {
-    expect(GHOST_COPIES_OPTIONS.at(-1)?.value).toBe(10)
+    const last = GHOST_COPIES_OPTIONS[GHOST_COPIES_OPTIONS.length - 1]
+    expect(last?.value).toBe(10)
   })
 })
 
