@@ -14,10 +14,62 @@ function getGhostOpacity(index: number, total: number): number {
   return Math.max(0.08, 0.4 * (1 - index / total))
 }
 
+const guideLineBase: React.CSSProperties = {
+  position: 'absolute',
+  pointerEvents: 'none',
+}
+
+function HLine({ top, color }: { top: string; color: string }) {
+  return (
+    <div
+      style={{
+        ...guideLineBase,
+        top,
+        left: 0,
+        right: 0,
+        borderTop: `1px dashed ${color}`,
+      }}
+    />
+  )
+}
+
+function VLine({ left, color }: { left: string; color: string }) {
+  return (
+    <div
+      style={{
+        ...guideLineBase,
+        left,
+        top: 0,
+        bottom: 0,
+        borderLeft: `1px dashed ${color}`,
+      }}
+    />
+  )
+}
+
 function GuideLines({ guide }: { guide: string }) {
-  if (guide === 'thai') return <div className="guide-lines-thai" />
-  if (guide === 'cross') return <div className="guide-lines-cross" />
-  if (guide === 'sandwich') return <div className="guide-lines-sandwich" />
+  if (guide === 'thai')
+    return (
+      <>
+        <HLine top="25%" color="#c8e6c9" />
+        <HLine top="50%" color="#c8e6c9" />
+        <HLine top="75%" color="#c8e6c9" />
+      </>
+    )
+  if (guide === 'cross')
+    return (
+      <>
+        <HLine top="50%" color="#e0e0e0" />
+        <VLine left="50%" color="#e0e0e0" />
+      </>
+    )
+  if (guide === 'sandwich')
+    return (
+      <>
+        <HLine top="25%" color="#e0e0e0" />
+        <HLine top="75%" color="#e0e0e0" />
+      </>
+    )
   return null
 }
 
@@ -43,22 +95,14 @@ function PracticeGrid({
 
   const charStyle: React.CSSProperties = {
     position: 'absolute',
-    top: 0,
+    top: Math.round((sz.cellPx - sz.text) / 2),
     left: 0,
     width: sz.cellPx,
-    height: sz.cellPx,
     zIndex: 1,
-    display: 'table',
-    tableLayout: 'fixed',
+    textAlign: 'center',
     fontSize: sz.text,
     fontFamily: 'inherit',
-    lineHeight: 1,
-  }
-
-  const charInnerStyle: React.CSSProperties = {
-    display: 'table-cell',
-    verticalAlign: 'middle',
-    textAlign: 'center',
+    lineHeight: `${sz.text}px`,
   }
 
   return (
@@ -89,19 +133,17 @@ function PracticeGrid({
                       aria-hidden="true"
                       style={charStyle}
                     >
-                      <span style={charInnerStyle}>
-                        {isVowel ? (
-                          <VowelDisplay
-                            char={char}
-                            ariaHidden
-                            className="leading-none"
-                            glyphClassName="text-current"
-                            placeholderClassName="text-gray-300"
-                          />
-                        ) : (
-                          <span style={{ fontWeight: 600 }}>{char}</span>
-                        )}
-                      </span>
+                      {isVowel ? (
+                        <VowelDisplay
+                          char={char}
+                          ariaHidden
+                          className="leading-none"
+                          glyphClassName="text-current"
+                          placeholderClassName="text-gray-300"
+                        />
+                      ) : (
+                        <span style={{ fontWeight: 600 }}>{char}</span>
+                      )}
                     </div>
                   )}
                   {isGhost && (
@@ -114,19 +156,17 @@ function PracticeGrid({
                         opacity: getGhostOpacity(ghostIdx, ghostCopies),
                       }}
                     >
-                      <span style={charInnerStyle}>
-                        {isVowel ? (
-                          <VowelDisplay
-                            char={char}
-                            ariaHidden
-                            className="leading-none"
-                            glyphClassName="text-current"
-                            placeholderClassName="text-gray-300"
-                          />
-                        ) : (
-                          <span>{char}</span>
-                        )}
-                      </span>
+                      {isVowel ? (
+                        <VowelDisplay
+                          char={char}
+                          ariaHidden
+                          className="leading-none"
+                          glyphClassName="text-current"
+                          placeholderClassName="text-gray-300"
+                        />
+                      ) : (
+                        <span>{char}</span>
+                      )}
                     </div>
                   )}
                 </div>
