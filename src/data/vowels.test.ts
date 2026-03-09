@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { THAI_VOWELS } from './vowels'
+import { THAI_VOWELS, formatVowelWithPlaceholder, splitVowelForDisplay } from './vowels'
 
 describe('THAI_VOWELS', () => {
   it('has at least 28 vowels (PRD: ~32; exact TBD)', () => {
@@ -21,5 +21,33 @@ describe('THAI_VOWELS', () => {
   it('ids are unique', () => {
     const ids = THAI_VOWELS.map((v) => v.id)
     expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('formats vowels with a placeholder อ', () => {
+    expect(formatVowelWithPlaceholder('า')).toBe('อา')
+    expect(formatVowelWithPlaceholder('เ')).toBe('เอ')
+    expect(formatVowelWithPlaceholder('ำ')).toBe('อํา')
+    expect(formatVowelWithPlaceholder('เีย')).toBe('เอีย')
+  })
+
+  it('splits vowels into display parts around the placeholder', () => {
+    expect(splitVowelForDisplay('เีย')).toEqual({
+      prefix: 'เ',
+      upper: 'ี',
+      lower: '',
+      suffix: 'ย',
+    })
+    expect(splitVowelForDisplay('ุ')).toEqual({
+      prefix: '',
+      upper: '',
+      lower: 'ุ',
+      suffix: '',
+    })
+    expect(splitVowelForDisplay('ำ')).toEqual({
+      prefix: '',
+      upper: 'ํ',
+      lower: '',
+      suffix: 'า',
+    })
   })
 })

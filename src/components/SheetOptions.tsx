@@ -1,9 +1,9 @@
 import type { SheetConfig } from '../data/sheetOptions'
 import {
+  COLUMNS_OPTIONS,
   GRID_GUIDE_OPTIONS,
   FONT_OPTIONS,
   FONT_SIZE_OPTIONS,
-  PAPER_SIZE_OPTIONS,
   ROWS_PER_CHARACTER_OPTIONS,
   GHOST_COPIES_OPTIONS,
 } from '../data/sheetOptions'
@@ -24,14 +24,22 @@ export function SheetOptions({ config, onChange }: SheetOptionsProps) {
     onChange({ ...config, ...partial })
   }
 
+  const handleColumnsChange = (value: string) => {
+    const columns = Number(value) || COLUMNS_OPTIONS[COLUMNS_OPTIONS.length - 1].value
+    update({
+      columns,
+      ghostCopiesPerRow: Math.min(config.ghostCopiesPerRow, columns),
+    })
+  }
+
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm" aria-label="Sheet options">
       <h2 className="text-lg font-bold text-gray-900 mb-4">Sheet Options</h2>
 
-      <div className="flex flex-wrap gap-4">
-        <div className="flex-1 min-w-[130px]">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+        <div className="min-w-0">
           <label htmlFor="rows-per-char" className={labelClasses}>
-            Rows per character
+            Rows
           </label>
           <select
             id="rows-per-char"
@@ -47,9 +55,27 @@ export function SheetOptions({ config, onChange }: SheetOptionsProps) {
           </select>
         </div>
 
-        <div className="flex-1 min-w-[130px]">
+        <div className="min-w-0">
+          <label htmlFor="columns" className={labelClasses}>
+            Columns
+          </label>
+          <select
+            id="columns"
+            value={config.columns}
+            onChange={(e) => handleColumnsChange(e.target.value)}
+            className={selectClasses}
+          >
+            {COLUMNS_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="min-w-0">
           <label htmlFor="ghost-copies" className={labelClasses}>
-            Ghost copies per row
+            Ghost Copies
           </label>
           <select
             id="ghost-copies"
@@ -58,32 +84,14 @@ export function SheetOptions({ config, onChange }: SheetOptionsProps) {
             className={selectClasses}
           >
             {GHOST_COPIES_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
+              <option key={o.value} value={o.value} disabled={o.value > config.columns}>
                 {o.label}
               </option>
             ))}
           </select>
         </div>
 
-        <div className="flex-1 min-w-[130px]">
-          <label htmlFor="paper-size" className={labelClasses}>
-            Paper size
-          </label>
-          <select
-            id="paper-size"
-            value={config.paperSize}
-            onChange={(e) => update({ paperSize: e.target.value })}
-            className={selectClasses}
-          >
-            {PAPER_SIZE_OPTIONS.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex-1 min-w-[130px]">
+        <div className="min-w-0">
           <label htmlFor="grid-guide" className={labelClasses}>
             Grid guide
           </label>
@@ -101,7 +109,7 @@ export function SheetOptions({ config, onChange }: SheetOptionsProps) {
           </select>
         </div>
 
-        <div className="flex-1 min-w-[130px]">
+        <div className="min-w-0">
           <label htmlFor="font" className={labelClasses}>
             Font
           </label>
@@ -118,24 +126,23 @@ export function SheetOptions({ config, onChange }: SheetOptionsProps) {
             ))}
           </select>
         </div>
-      </div>
-
-      <div className="mt-3 max-w-[160px]">
-        <label htmlFor="font-size" className={labelClasses}>
-          Font size
-        </label>
-        <select
-          id="font-size"
-          value={config.fontSize}
-          onChange={(e) => update({ fontSize: e.target.value })}
-          className={selectClasses}
-        >
-          {FONT_SIZE_OPTIONS.map((o) => (
-            <option key={o.id} value={o.id}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+        <div className="min-w-0">
+          <label htmlFor="font-size" className={labelClasses}>
+            Font size
+          </label>
+          <select
+            id="font-size"
+            value={config.fontSize}
+            onChange={(e) => update({ fontSize: e.target.value })}
+            className={selectClasses}
+          >
+            {FONT_SIZE_OPTIONS.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </section>
   )

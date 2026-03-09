@@ -12,8 +12,19 @@ function App() {
   const selection = useContentSelection()
   const [sheetConfig, setSheetConfig] = useState<SheetConfig>(DEFAULT_SHEET_CONFIG)
   const previewRef = useRef<HTMLDivElement>(null)
+  const pdfFormat = 'a4'
 
   const handlePrint = () => {
+    const el = previewRef.current
+    if (!el) return
+
+    document.body.classList.add('print-preview-active')
+
+    const cleanup = () => {
+      document.body.classList.remove('print-preview-active')
+    }
+
+    window.addEventListener('afterprint', cleanup, { once: true })
     window.print()
   }
 
@@ -27,7 +38,7 @@ function App() {
         filename: 'thai-script-practice.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: sheetConfig.paperSize, orientation: 'portrait' },
+        jsPDF: { unit: 'mm', format: pdfFormat, orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
       })
       .from(el)
@@ -50,7 +61,7 @@ function App() {
         </p>
       </div>
 
-      <main className="max-w-[900px] mx-auto px-4 pb-16 space-y-6">
+      <main className="max-w-5xl mx-auto px-4 pb-16 space-y-6">
         <ContentSelection
           selectedConsonantIds={selection.selectedConsonantIds}
           selectedVowelIds={selection.selectedVowelIds}
@@ -69,7 +80,7 @@ function App() {
           <OutputActions onPrint={handlePrint} onDownloadPdf={handleDownloadPdf} />
         </div>
 
-        <div ref={previewRef}>
+        <div ref={previewRef} className="print-preview-root">
           <Preview
             selectedConsonantIds={selection.selectedConsonantIds}
             selectedVowelIds={selection.selectedVowelIds}

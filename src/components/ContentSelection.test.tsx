@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ContentSelection } from './ContentSelection'
 import { THAI_CONSONANTS } from '../data/consonants'
-import { THAI_VOWELS } from '../data/vowels'
+import { THAI_VOWELS, formatVowelWithPlaceholder } from '../data/vowels'
 
 describe('ContentSelection', () => {
   it('renders a Consonants section with heading', () => {
@@ -12,8 +12,10 @@ describe('ContentSelection', () => {
   })
 
   it('renders all 44 consonant items', () => {
-    render(<ContentSelection />)
-    expect(THAI_CONSONANTS.every((c) => screen.getByText(c.char))).toBe(true)
+    const { container } = render(<ContentSelection />)
+    const consonantGrid = container.querySelectorAll('.grid.grid-cols-10')[0]
+    const buttons = consonantGrid.querySelectorAll('button')
+    expect(buttons).toHaveLength(44)
   })
 
   it('clicking a consonant toggles selection and updates summary', async () => {
@@ -23,8 +25,8 @@ describe('ContentSelection', () => {
     expect(summary).toBeInTheDocument()
 
     const firstConsonant = THAI_CONSONANTS[0]
-    const button = screen.getByRole('button', { name: new RegExp(`^${firstConsonant.char}`) })
-    await user.click(button)
+    const buttons = screen.getAllByRole('button', { name: new RegExp(`^${firstConsonant.char}`) })
+    await user.click(buttons[0])
 
     expect(screen.getByText(/1 consonants?/i)).toBeInTheDocument()
   })
@@ -51,5 +53,11 @@ describe('ContentSelection', () => {
     expect(screen.getByRole('heading', { name: /vowels/i })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /select all.*vowel/i }))
     expect(screen.getByText(new RegExp(`${THAI_VOWELS.length} vowels?`, 'i'))).toBeInTheDocument()
+  })
+
+  it('shows vowels with a placeholder dash', () => {
+    render(<ContentSelection />)
+    expect(screen.getByRole('button', { name: formatVowelWithPlaceholder('ะ') })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: formatVowelWithPlaceholder('เ') })).toBeInTheDocument()
   })
 })

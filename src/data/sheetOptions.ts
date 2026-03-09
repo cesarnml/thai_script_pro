@@ -14,23 +14,18 @@ export interface FontSizeOption {
   label: string
 }
 
-export interface PaperSizeOption {
-  id: string
-  label: string
-}
-
 export interface SheetConfig {
   rowsPerCharacter: number
+  columns: number
   ghostCopiesPerRow: number
-  paperSize: string
   gridGuide: string
   font: string
   fontSize: string
 }
 
 export const GRID_GUIDE_OPTIONS: GridGuideOption[] = [
-  { id: 'cross', label: 'Cross (horizontal + vertical)' },
-  { id: 'sandwich', label: 'Sandwich (top & bottom)' },
+  { id: 'cross', label: 'Cross' },
+  { id: 'sandwich', label: 'Sandwich' },
   { id: 'thai', label: 'Thai (3 lines)' },
 ]
 
@@ -48,11 +43,6 @@ export const FONT_SIZE_OPTIONS: FontSizeOption[] = [
   { id: 'large', label: 'Large (48pt)' },
 ]
 
-export const PAPER_SIZE_OPTIONS: PaperSizeOption[] = [
-  { id: 'a4', label: 'A4' },
-  { id: 'letter', label: 'Letter' },
-]
-
 export const ROWS_PER_CHARACTER_OPTIONS = [
   { value: 1, label: '1 row' },
   { value: 2, label: '2 rows' },
@@ -64,6 +54,15 @@ export const ROWS_PER_CHARACTER_OPTIONS = [
   { value: 8, label: '8 rows' },
 ]
 
+export const COLUMNS_OPTIONS = [
+  { value: 5, label: '5 columns' },
+  { value: 6, label: '6 columns' },
+  { value: 7, label: '7 columns' },
+  { value: 8, label: '8 columns' },
+  { value: 9, label: '9 columns' },
+  { value: 10, label: '10 columns' },
+]
+
 export const GHOST_COPIES_OPTIONS = [
   { value: 1, label: '1 copy' },
   { value: 2, label: '2 copies' },
@@ -71,6 +70,10 @@ export const GHOST_COPIES_OPTIONS = [
   { value: 4, label: '4 copies' },
   { value: 5, label: '5 copies' },
   { value: 6, label: '6 copies' },
+  { value: 7, label: '7 copies' },
+  { value: 8, label: '8 copies' },
+  { value: 9, label: '9 copies' },
+  { value: 10, label: '10 copies' },
 ]
 
 export const FONT_SIZE_MAP: Record<string, { text: number; cellPx: number }> = {
@@ -90,10 +93,10 @@ export const FONT_FAMILY_MAP: Record<string, string> = {
 const defaultFont = FONT_OPTIONS.find((f) => f.isDefault)!
 
 export const DEFAULT_SHEET_CONFIG: SheetConfig = {
-  rowsPerCharacter: 2,
-  ghostCopiesPerRow: 3,
-  paperSize: 'a4',
-  gridGuide: 'cross',
+  rowsPerCharacter: 3,
+  columns: 8,
+  ghostCopiesPerRow: 2,
+  gridGuide: 'thai',
   font: defaultFont.id,
   fontSize: 'medium',
 }

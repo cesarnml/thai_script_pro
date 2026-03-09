@@ -3,6 +3,62 @@ export interface ThaiVowel {
   char: string
 }
 
+const PREPOSED_VOWELS = new Set(['เ', 'แ', 'โ', 'ใ', 'ไ'])
+const UPPER_VOWEL_MARKS = new Set(['ั', 'ิ', 'ี', 'ึ', 'ื'])
+const LOWER_VOWEL_MARKS = new Set(['ุ', 'ู'])
+
+export interface VowelDisplayParts {
+  prefix: string
+  upper: string
+  lower: string
+  suffix: string
+}
+
+export function splitVowelForDisplay(char: string): VowelDisplayParts {
+  const parts = Array.from(char)
+  let prefixLength = 0
+
+  while (prefixLength < parts.length && PREPOSED_VOWELS.has(parts[prefixLength])) {
+    prefixLength += 1
+  }
+
+  let upper = ''
+  let lower = ''
+  let suffix = ''
+
+  for (const part of parts.slice(prefixLength)) {
+    if (part === 'ำ') {
+      upper += 'ํ'
+      suffix += 'า'
+      continue
+    }
+
+    if (UPPER_VOWEL_MARKS.has(part)) {
+      upper += part
+      continue
+    }
+
+    if (LOWER_VOWEL_MARKS.has(part)) {
+      lower += part
+      continue
+    }
+
+    suffix += part
+  }
+
+  return {
+    prefix: parts.slice(0, prefixLength).join(''),
+    upper,
+    lower,
+    suffix,
+  }
+}
+
+export function formatVowelWithPlaceholder(char: string): string {
+  const { prefix, upper, lower, suffix } = splitVowelForDisplay(char)
+  return `${prefix}อ${upper}${lower}${suffix}`
+}
+
 /**
  * Thai vowel symbols (traditional set). PRD ~32; includes
  * core vowels and common compound forms for practice.

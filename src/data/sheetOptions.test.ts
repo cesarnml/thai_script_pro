@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import {
+  COLUMNS_OPTIONS,
   GRID_GUIDE_OPTIONS,
   FONT_OPTIONS,
   FONT_SIZE_OPTIONS,
-  PAPER_SIZE_OPTIONS,
+  GHOST_COPIES_OPTIONS,
   DEFAULT_SHEET_CONFIG,
   type SheetConfig,
 } from './sheetOptions'
@@ -12,8 +13,8 @@ describe('GRID_GUIDE_OPTIONS', () => {
   it('has exactly 3 options (Cross, Sandwich, Thai)', () => {
     expect(GRID_GUIDE_OPTIONS).toHaveLength(3)
     const labels = GRID_GUIDE_OPTIONS.map((o) => o.label)
-    expect(labels).toContain('Cross (horizontal + vertical)')
-    expect(labels).toContain('Sandwich (top & bottom)')
+    expect(labels).toContain('Cross')
+    expect(labels).toContain('Sandwich')
     expect(labels).toContain('Thai (3 lines)')
   })
 
@@ -57,18 +58,23 @@ describe('FONT_SIZE_OPTIONS', () => {
   })
 })
 
-describe('PAPER_SIZE_OPTIONS', () => {
-  it('includes A4 and Letter', () => {
-    const ids = PAPER_SIZE_OPTIONS.map((o) => o.id)
-    expect(ids).toContain('a4')
-    expect(ids).toContain('letter')
+describe('COLUMNS_OPTIONS', () => {
+  it('includes columns 5 through 10', () => {
+    const values = COLUMNS_OPTIONS.map((o) => o.value)
+    expect(values).toEqual([5, 6, 7, 8, 9, 10])
   })
 
-  it('each has id and label', () => {
-    for (const opt of PAPER_SIZE_OPTIONS) {
-      expect(opt).toHaveProperty('id')
+  it('each has value and label', () => {
+    for (const opt of COLUMNS_OPTIONS) {
+      expect(opt).toHaveProperty('value')
       expect(opt).toHaveProperty('label')
     }
+  })
+})
+
+describe('GHOST_COPIES_OPTIONS', () => {
+  it('supports up to 10 copies', () => {
+    expect(GHOST_COPIES_OPTIONS.at(-1)?.value).toBe(10)
   })
 })
 
@@ -76,15 +82,16 @@ describe('DEFAULT_SHEET_CONFIG', () => {
   it('matches SheetConfig shape', () => {
     const c = DEFAULT_SHEET_CONFIG as SheetConfig
     expect(c).toHaveProperty('rowsPerCharacter')
+    expect(c).toHaveProperty('columns')
     expect(c).toHaveProperty('ghostCopiesPerRow')
-    expect(c).toHaveProperty('paperSize')
     expect(c).toHaveProperty('gridGuide')
     expect(c).toHaveProperty('font')
     expect(c).toHaveProperty('fontSize')
   })
 
-  it('has sensible defaults (e.g. 2 rows, 3 ghost copies)', () => {
-    expect(DEFAULT_SHEET_CONFIG.rowsPerCharacter).toBeGreaterThanOrEqual(1)
+  it('has sensible defaults (3 rows, 8 columns, 3 ghost copies)', () => {
+    expect(DEFAULT_SHEET_CONFIG.rowsPerCharacter).toBe(3)
+    expect(DEFAULT_SHEET_CONFIG.columns).toBe(8)
     expect(DEFAULT_SHEET_CONFIG.ghostCopiesPerRow).toBeGreaterThanOrEqual(1)
   })
 

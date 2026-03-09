@@ -2,6 +2,7 @@ import type { SheetConfig } from '../data/sheetOptions'
 import { THAI_CONSONANTS } from '../data/consonants'
 import { THAI_VOWELS } from '../data/vowels'
 import { FONT_OPTIONS, FONT_FAMILY_MAP, FONT_SIZE_MAP } from '../data/sheetOptions'
+import { VowelDisplay } from './VowelDisplay'
 
 interface PreviewProps {
   selectedConsonantIds: string[]
@@ -22,13 +23,16 @@ function GuideLines({ guide }: { guide: string }) {
 
 function PracticeGrid({
   char,
+  isVowel = false,
   config,
 }: {
   char: string
+  isVowel?: boolean
   config: SheetConfig
 }) {
-  const totalCols = config.ghostCopiesPerRow + 4
   const sz = FONT_SIZE_MAP[config.fontSize] || FONT_SIZE_MAP.medium
+  const firstRowGhostCopies = Math.min(config.ghostCopiesPerRow, Math.max(config.columns - 1, 0))
+  const laterRowGhostCopies = Math.min(firstRowGhostCopies + 1, config.columns)
 
   const cellStyle: React.CSSProperties = {
     width: sz.cellPx,
@@ -39,82 +43,98 @@ function PracticeGrid({
 
   const charStyle: React.CSSProperties = {
     position: 'absolute',
-    inset: 0,
+    top: 0,
+    left: 0,
     width: sz.cellPx,
     height: sz.cellPx,
     zIndex: 1,
+    display: 'table',
+    tableLayout: 'fixed',
+    fontSize: sz.text,
+    fontFamily: 'inherit',
+    lineHeight: 1,
+  }
+
+  const charInnerStyle: React.CSSProperties = {
+    display: 'table-cell',
+    verticalAlign: 'middle',
+    textAlign: 'center',
   }
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${totalCols}, ${sz.cellPx}px)`,
-      }}
-    >
-      {Array.from({ length: config.rowsPerCharacter }).map((_, row) =>
-        Array.from({ length: totalCols }).map((_, col) => {
-          const isFirstRow = row === 0
-          const isModel = isFirstRow && col === 0
-          const ghostIdx = isFirstRow ? col - 1 : col
-          const isGhost = isFirstRow
-            ? col > 0 && col <= config.ghostCopiesPerRow
-            : col < config.ghostCopiesPerRow
+    <div>
+      {Array.from({ length: config.rowsPerCharacter }).map((_, row) => {
+        const isFirstRow = row === 0
+        const ghostCopies = isFirstRow ? firstRowGhostCopies : laterRowGhostCopies
 
-          return (
-            <div key={`${row}-${col}`} style={cellStyle}>
-              <GuideLines guide={config.gridGuide} />
-              {isModel && (
-                <svg
-                  aria-hidden="true"
-                  style={charStyle}
-                  width={sz.cellPx}
-                  height={sz.cellPx}
-                  viewBox={`0 0 ${sz.cellPx} ${sz.cellPx}`}
-                >
-                  <text
-                    x="50%"
-                    y="50%"
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fontSize={sz.text}
-                    fontWeight={600}
-                    fontFamily="inherit"
-                    fill="currentColor"
-                  >
-                    {char}
-                  </text>
-                </svg>
-              )}
-              {isGhost && (
-                <svg
-                  aria-hidden="true"
-                  style={{
-                    ...charStyle,
-                    color: '#9ca3af',
-                    opacity: getGhostOpacity(ghostIdx, config.ghostCopiesPerRow),
-                  }}
-                  width={sz.cellPx}
-                  height={sz.cellPx}
-                  viewBox={`0 0 ${sz.cellPx} ${sz.cellPx}`}
-                >
-                  <text
-                    x="50%"
-                    y="50%"
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fontSize={sz.text}
-                    fontFamily="inherit"
-                    fill="currentColor"
-                  >
-                    {char}
-                  </text>
-                </svg>
-              )}
-            </div>
-          )
-        })
-      )}
+        return (
+          <div
+            key={row}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${config.columns}, ${sz.cellPx}px)`,
+            }}
+          >
+            {Array.from({ length: config.columns }).map((_, col) => {
+              const isModel = isFirstRow && col === 0
+              const ghostIdx = isFirstRow ? col - 1 : col
+              const isGhost = isFirstRow ? col > 0 && col <= ghostCopies : col < ghostCopies
+
+              return (
+                <div key={`${row}-${col}`} style={cellStyle}>
+                  <GuideLines guide={config.gridGuide} />
+                  {isModel && (
+                    <div
+                      data-char-overlay="true"
+                      aria-hidden="true"
+                      style={charStyle}
+                    >
+                      <span style={charInnerStyle}>
+                        {isVowel ? (
+                          <VowelDisplay
+                            char={char}
+                            ariaHidden
+                            className="leading-none"
+                            glyphClassName="text-current"
+                            placeholderClassName="text-gray-300"
+                          />
+                        ) : (
+                          <span style={{ fontWeight: 600 }}>{char}</span>
+                        )}
+                      </span>
+                    </div>
+                  )}
+                  {isGhost && (
+                    <div
+                      data-char-overlay="true"
+                      aria-hidden="true"
+                      style={{
+                        ...charStyle,
+                        color: '#9ca3af',
+                        opacity: getGhostOpacity(ghostIdx, ghostCopies),
+                      }}
+                    >
+                      <span style={charInnerStyle}>
+                        {isVowel ? (
+                          <VowelDisplay
+                            char={char}
+                            ariaHidden
+                            className="leading-none"
+                            glyphClassName="text-current"
+                            placeholderClassName="text-gray-300"
+                          />
+                        ) : (
+                          <span>{char}</span>
+                        )}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -151,8 +171,7 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
           </h3>
           <p className="text-center text-sm text-gray-400 mb-8">
             Thai {charType.charAt(0).toUpperCase() + charType.slice(1)} Writing
-            Practice &middot; {totalChars} {charType} &middot;{' '}
-            {config.paperSize.toUpperCase()} &middot; {fontLabel}
+            Practice &middot; {totalChars} {charType} &middot; {fontLabel}
           </p>
 
           <div className="space-y-8">
@@ -171,9 +190,9 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
             {vowels.map((v) => (
               <div key={v.id}>
                 <div className="flex items-baseline gap-2 mb-2">
-                  <span className="text-lg font-bold text-gray-900">{v.char}</span>
+                  <VowelDisplay char={v.char} className="text-lg font-bold text-gray-900" />
                 </div>
-                <PracticeGrid char={v.char} config={config} />
+                <PracticeGrid char={v.char} isVowel config={config} />
               </div>
             ))}
           </div>

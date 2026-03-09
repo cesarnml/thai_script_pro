@@ -1,6 +1,7 @@
 import { useContentSelection } from '../hooks/useContentSelection'
 import { THAI_CONSONANTS } from '../data/consonants'
-import { THAI_VOWELS } from '../data/vowels'
+import { THAI_VOWELS, formatVowelWithPlaceholder } from '../data/vowels'
+import { VowelDisplay } from './VowelDisplay'
 
 export interface ContentSelectionProps {
   selectedConsonantIds?: string[]
@@ -117,6 +118,7 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
               key={v.id}
               type="button"
               onClick={() => toggleVowel(v.id)}
+              aria-label={formatVowelWithPlaceholder(v.char)}
               aria-pressed={vowelSet.has(v.id)}
               className={`flex flex-col items-center py-2.5 px-1 rounded-xl border transition-colors ${
                 vowelSet.has(v.id)
@@ -124,7 +126,7 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
                   : 'bg-white border-gray-200 hover:bg-gray-50'
               }`}
             >
-              <span className="text-2xl leading-tight">{v.char}</span>
+              <VowelDisplay char={v.char} className="text-2xl leading-tight" />
             </button>
           ))}
         </div>
