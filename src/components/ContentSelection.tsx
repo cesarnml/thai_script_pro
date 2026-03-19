@@ -6,6 +6,7 @@ import { VowelDisplay } from './VowelDisplay'
 export interface ContentSelectionProps {
   selectedConsonantIds?: string[]
   selectedVowelIds?: string[]
+  fontFamily?: string
   onToggleConsonant?: (id: string) => void
   onToggleVowel?: (id: string) => void
   onSelectAllConsonants?: () => void
@@ -24,6 +25,7 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
   const clearConsonants = props.onClearConsonants ?? hook.clearConsonants
   const selectAllVowels = props.onSelectAllVowels ?? hook.selectAllVowels
   const clearVowels = props.onClearVowels ?? hook.clearVowels
+  const fontStyle = props.fontFamily ? { fontFamily: props.fontFamily } : undefined
 
   const consonantSet = new Set(selectedConsonantIds)
   const vowelSet = new Set(selectedVowelIds)
@@ -68,15 +70,22 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
               type="button"
               onClick={() => toggleConsonant(c.id)}
               aria-pressed={consonantSet.has(c.id)}
+              style={fontStyle}
               className={`flex flex-col items-center py-2.5 px-1 rounded-xl border transition-colors ${
                 consonantSet.has(c.id)
                   ? 'bg-indigo-50 border-indigo-300 ring-1 ring-indigo-200'
                   : 'bg-white border-gray-200 hover:bg-gray-50'
               }`}
             >
-              <span className="text-2xl leading-tight">{c.char}</span>
+              <span className="text-2xl leading-tight" translate="no" lang="th">
+                {c.char}
+              </span>
               {c.name && (
-                <span className="text-[10px] text-gray-400 mt-0.5 truncate max-w-full">
+                <span
+                  className="text-[10px] text-gray-400 mt-0.5 truncate max-w-full"
+                  translate="no"
+                  lang="th"
+                >
                   {c.name}
                 </span>
               )}
@@ -120,6 +129,7 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
               onClick={() => toggleVowel(v.id)}
               aria-label={formatVowelWithPlaceholder(v.char)}
               aria-pressed={vowelSet.has(v.id)}
+              style={fontStyle}
               className={`flex flex-col items-center py-2.5 px-1 rounded-xl border transition-colors ${
                 vowelSet.has(v.id)
                   ? 'bg-indigo-50 border-indigo-300 ring-1 ring-indigo-200'

@@ -48,16 +48,15 @@ function PracticeGrid({
     width: sz.cellPx,
     height: sz.cellPx,
     zIndex: 1,
-    display: 'table',
-    tableLayout: 'fixed',
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
     fontSize: sz.text,
     fontFamily: 'inherit',
     lineHeight: 1,
   }
 
   const charInnerStyle: React.CSSProperties = {
-    display: 'table-cell',
-    verticalAlign: 'middle',
     textAlign: 'center',
   }
 
@@ -166,7 +165,11 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
           className="bg-white rounded-2xl border border-gray-200 shadow-sm py-10 px-8 md:px-12"
           style={{ fontFamily }}
         >
-          <h3 className="text-center text-xl font-bold text-gray-900 mb-1">
+          <h3
+            className="text-center text-xl font-bold text-gray-900 mb-1"
+            translate="no"
+            lang="th"
+          >
             แบบฝึกหัดเขียนอักษรไทย
           </h3>
           <p className="text-center text-sm text-gray-400 mb-8">
@@ -178,8 +181,14 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
             {consonants.map((c) => (
               <div key={c.id}>
                 <div className="flex items-baseline gap-2 mb-2">
-                  <span className="text-lg font-bold text-gray-900">{c.char}</span>
-                  <span className="text-sm text-indigo-500 font-medium">
+                  <span className="text-lg font-bold text-gray-900" translate="no" lang="th">
+                    {c.char}
+                  </span>
+                  <span
+                    className="text-sm text-indigo-500 font-medium"
+                    translate="no"
+                    lang="th"
+                  >
                     {c.char}อ {c.name}
                   </span>
                 </div>
@@ -190,7 +199,10 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
             {vowels.map((v) => (
               <div key={v.id}>
                 <div className="flex items-baseline gap-2 mb-2">
-                  <VowelDisplay char={v.char} className="text-lg font-bold text-gray-900" />
+                  <VowelDisplay
+                    char={v.char}
+                    className="text-lg font-bold text-gray-900"
+                  />
                 </div>
                 <PracticeGrid char={v.char} isVowel config={config} />
               </div>

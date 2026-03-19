@@ -97,4 +97,12 @@ describe('VowelDisplay', () => {
       }
     }
   })
+
+  it('marks the visible Thai glyph wrapper as non-translatable', () => {
+    const { container } = render(<VowelDisplay char="ะ" />)
+    const visibleGlyphWrapper = container.querySelector('[aria-hidden="true"]')
+
+    expect(visibleGlyphWrapper).toHaveAttribute('translate', 'no')
+    expect(visibleGlyphWrapper).toHaveAttribute('lang', 'th')
+  })
 })

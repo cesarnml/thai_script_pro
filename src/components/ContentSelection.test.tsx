@@ -60,4 +60,32 @@ describe('ContentSelection', () => {
     expect(screen.getByRole('button', { name: formatVowelWithPlaceholder('ะ') })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: formatVowelWithPlaceholder('เ') })).toBeInTheDocument()
   })
+
+  it('applies the selected font family to consonant and vowel buttons', () => {
+    render(<ContentSelection fontFamily='"Prompt", sans-serif' />)
+
+    expect(screen.getAllByRole('button', { name: /^ก/ })[0]).toHaveStyle({
+      fontFamily: '"Prompt", sans-serif',
+    })
+    expect(screen.getByRole('button', { name: formatVowelWithPlaceholder('ะ') })).toHaveStyle({
+      fontFamily: '"Prompt", sans-serif',
+    })
+  })
+
+  it('marks visible Thai consonant glyphs and names as non-translatable', () => {
+    const { container } = render(<ContentSelection />)
+    const firstConsonant = THAI_CONSONANTS[0]
+
+    const glyph = Array.from(container.querySelectorAll('span')).find(
+      (node) => node.textContent === firstConsonant.char
+    )
+    const name = Array.from(container.querySelectorAll('span')).find(
+      (node) => node.textContent === firstConsonant.name
+    )
+
+    expect(glyph).toHaveAttribute('translate', 'no')
+    expect(glyph).toHaveAttribute('lang', 'th')
+    expect(name).toHaveAttribute('translate', 'no')
+    expect(name).toHaveAttribute('lang', 'th')
+  })
 })

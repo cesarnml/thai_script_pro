@@ -22,7 +22,12 @@ export function VowelDisplay({
   return (
     <span className={`inline-flex items-center whitespace-nowrap ${className}`.trim()}>
       {!ariaHidden && <span className="sr-only">{label}</span>}
-      <span aria-hidden="true" className="inline-flex items-baseline leading-none">
+      <span
+        aria-hidden="true"
+        className="inline-flex items-baseline leading-none"
+        translate="no"
+        lang="th"
+      >
         {prefix && <span className={glyphClassName}>{prefix}</span>}
         {hasMarks ? (
           <span className="relative">

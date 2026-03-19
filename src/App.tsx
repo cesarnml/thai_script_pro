@@ -1,18 +1,18 @@
 import { useRef, useState } from 'react'
-import html2pdf from 'html2pdf.js'
 import { ContentSelection } from './components/ContentSelection'
 import { SheetOptions } from './components/SheetOptions'
 import { Preview } from './components/Preview'
 import { OutputActions } from './components/OutputActions'
 import { useContentSelection } from './hooks/useContentSelection'
-import { DEFAULT_SHEET_CONFIG } from './data/sheetOptions'
+import { DEFAULT_SHEET_CONFIG, FONT_FAMILY_MAP } from './data/sheetOptions'
 import type { SheetConfig } from './data/sheetOptions'
+import { downloadPracticePdf } from './pdf/downloadPracticePdf'
 
 function App() {
   const selection = useContentSelection()
   const [sheetConfig, setSheetConfig] = useState<SheetConfig>(DEFAULT_SHEET_CONFIG)
   const previewRef = useRef<HTMLDivElement>(null)
-  const pdfFormat = 'a4'
+  const selectedFontFamily = FONT_FAMILY_MAP[sheetConfig.font] || '"Sarabun", sans-serif'
 
   const handlePrint = () => {
     const el = previewRef.current
@@ -28,21 +28,12 @@ function App() {
     window.print()
   }
 
-  const handleDownloadPdf = () => {
-    const el = previewRef.current
-    if (!el) return
-
-    html2pdf()
-      .set({
-        margin: [10, 10],
-        filename: 'thai-script-practice.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: pdfFormat, orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-      })
-      .from(el)
-      .save()
+  const handleDownloadPdf = async () => {
+    await downloadPracticePdf({
+      selectedConsonantIds: selection.selectedConsonantIds,
+      selectedVowelIds: selection.selectedVowelIds,
+      config: sheetConfig,
+    })
   }
 
   return (
@@ -67,6 +58,7 @@ function App() {
         <ContentSelection
           selectedConsonantIds={selection.selectedConsonantIds}
           selectedVowelIds={selection.selectedVowelIds}
+          fontFamily={selectedFontFamily}
           onToggleConsonant={selection.toggleConsonant}
           onToggleVowel={selection.toggleVowel}
           onSelectAllConsonants={selection.selectAllConsonants}
@@ -80,7 +72,7 @@ function App() {
           <OutputActions onPrint={handlePrint} onDownloadPdf={handleDownloadPdf} />
         </div>
 
-        <div ref={previewRef} className="print-preview-root">
+        <div ref={previewRef} className="print-preview-root" data-live-preview-root="true">
           <Preview
             selectedConsonantIds={selection.selectedConsonantIds}
             selectedVowelIds={selection.selectedVowelIds}

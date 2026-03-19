@@ -148,4 +148,76 @@ describe('Preview', () => {
 
     expect(screen.getByRole('region', { name: /preview/i })).toHaveTextContent('Modern')
   })
+
+  it('bottom-aligns and horizontally centers character overlays', () => {
+    const { container } = render(
+      <Preview
+        selectedConsonantIds={[THAI_CONSONANTS[0].id]}
+        selectedVowelIds={[]}
+        config={DEFAULT_SHEET_CONFIG}
+      />
+    )
+
+    const overlay = container.querySelector('[data-char-overlay="true"]')
+    expect(overlay).not.toBeNull()
+    expect(overlay).toHaveStyle({
+      display: 'flex',
+      alignItems: 'flex-end',
+      justifyContent: 'center',
+    })
+
+    const inner = overlay?.querySelector('span')
+    expect(inner).not.toBeNull()
+    expect(inner).toHaveStyle({ textAlign: 'center' })
+  })
+
+  it('keeps vowels inside the same bottom-aligned overlay container', () => {
+    const { container } = render(
+      <Preview
+        selectedConsonantIds={[]}
+        selectedVowelIds={[THAI_VOWELS[0].id]}
+        config={DEFAULT_SHEET_CONFIG}
+      />
+    )
+
+    const overlay = container.querySelector('[data-char-overlay="true"]')
+    expect(overlay).not.toBeNull()
+    expect(overlay).toHaveStyle({
+      display: 'flex',
+      alignItems: 'flex-end',
+      justifyContent: 'center',
+    })
+    expect(overlay?.textContent).toContain(formatVowelWithPlaceholder(THAI_VOWELS[0].char))
+  })
+
+  it('marks Thai preview text as non-translatable', () => {
+    const { container } = render(
+      <Preview
+        selectedConsonantIds={[THAI_CONSONANTS[0].id]}
+        selectedVowelIds={[THAI_VOWELS[0].id]}
+        config={DEFAULT_SHEET_CONFIG}
+      />
+    )
+
+    const worksheetTitle = Array.from(container.querySelectorAll('h3')).find(
+      (node) => node.textContent === 'แบบฝึกหัดเขียนอักษรไทย'
+    )
+    const consonantGlyph = Array.from(container.querySelectorAll('span')).find(
+      (node) => node.textContent === THAI_CONSONANTS[0].char
+    )
+    const consonantName = Array.from(container.querySelectorAll('span')).find(
+      (node) => node.textContent === `${THAI_CONSONANTS[0].char}อ ${THAI_CONSONANTS[0].name}`
+    )
+    const vowelGlyphWrapper = container.querySelector(
+      '[aria-hidden="true"][translate="no"][lang="th"]'
+    )
+
+    expect(worksheetTitle).toHaveAttribute('translate', 'no')
+    expect(worksheetTitle).toHaveAttribute('lang', 'th')
+    expect(consonantGlyph).toHaveAttribute('translate', 'no')
+    expect(consonantGlyph).toHaveAttribute('lang', 'th')
+    expect(consonantName).toHaveAttribute('translate', 'no')
+    expect(consonantName).toHaveAttribute('lang', 'th')
+    expect(vowelGlyphWrapper).not.toBeNull()
+  })
 })
