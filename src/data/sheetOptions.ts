@@ -111,11 +111,22 @@ export function getAllowedColumnOptions(fontSize: string) {
   return COLUMNS_OPTIONS.filter((option) => option.value <= maxColumns)
 }
 
+export function getInitialColumnsForWidth(fontSize: string, availableWidthPx: number): number {
+  const cellPx = (FONT_SIZE_MAP[fontSize] || FONT_SIZE_MAP.medium).cellPx
+  const printableMax = getMaxColumnsForFontSize(fontSize)
+  const viewportFitMax = Math.floor(availableWidthPx / cellPx)
+  const maxConfigured = COLUMNS_OPTIONS[COLUMNS_OPTIONS.length - 1].value
+  const minConfigured = COLUMNS_OPTIONS[0].value
+  const computedMax = Math.min(viewportFitMax, printableMax, maxConfigured)
+
+  return Math.max(minConfigured, computedMax)
+}
+
 const defaultFont = FONT_OPTIONS.find((f) => f.isDefault)!
 
 export const DEFAULT_SHEET_CONFIG: SheetConfig = {
   rowsPerCharacter: 3,
-  columns: 8,
+  columns: 3,
   ghostCopiesPerRow: 2,
   gridGuide: 'thai',
   font: defaultFont.id,

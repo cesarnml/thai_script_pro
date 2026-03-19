@@ -17,6 +17,8 @@ vi.mock('./pdf/downloadPracticePdf', () => ({
 import App from './App'
 
 describe('App', () => {
+  const originalClientWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth')
+
   beforeEach(() => {
     vi.restoreAllMocks()
     vi.useRealTimers()
@@ -26,6 +28,11 @@ describe('App', () => {
 
   afterEach(() => {
     vi.useRealTimers()
+    if (originalClientWidth) {
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', originalClientWidth)
+    } else {
+      Reflect.deleteProperty(HTMLElement.prototype, 'clientWidth')
+    }
   })
 
   it('renders app title Thai Script Pro', () => {
@@ -74,6 +81,21 @@ describe('App', () => {
       selectedVowelIds: [],
       config: DEFAULT_SHEET_CONFIG,
     })
+  })
+
+  it('grows the initial columns from 3 to the largest viewport-safe value on first load', async () => {
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+      configurable: true,
+      get() {
+        if ((this as HTMLElement).dataset.previewSurface === 'true') return 720
+        return 0
+      },
+    })
+
+    render(<App />)
+
+    expect(await screen.findByLabelText(/^columns$/i)).toHaveValue('9')
+    expect(screen.queryByText('Adjusted to 9 columns so it fits on the page.')).not.toBeInTheDocument()
   })
 
   it('applies the font dropdown selection to content selection buttons', async () => {

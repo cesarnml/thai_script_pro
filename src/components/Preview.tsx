@@ -155,7 +155,7 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
   return (
     <section role="region" aria-label="Preview" className="min-h-[200px]">
       {totalChars === 0 ? (
-        <div className="bg-white rounded-2xl p-12 text-center">
+        <div className="bg-white rounded-2xl p-12 text-center" data-preview-surface="true">
           <p className="text-gray-400 text-sm">
             Select consonants or vowels to see preview.
           </p>
@@ -164,6 +164,7 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
         <div
           className="relative bg-white rounded-2xl border border-gray-200 shadow-sm py-10 px-8 md:px-12"
           style={{ fontFamily }}
+          data-preview-surface="true"
         >
           <h3
             className="text-center text-xl font-bold text-gray-900 mb-1"

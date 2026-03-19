@@ -42,7 +42,7 @@ describe('SheetOptions', () => {
     render(<SheetOptions config={DEFAULT_SHEET_CONFIG} onChange={mockOnChange} />)
     const columnsSelect = screen.getByLabelText(/^columns$/i)
     expect(columnsSelect).toBeInTheDocument()
-    expect(columnsSelect).toHaveValue('8')
+    expect(columnsSelect).toHaveValue('3')
   })
 
   it('renders ghost copies control', () => {

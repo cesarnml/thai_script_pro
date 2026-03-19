@@ -8,6 +8,7 @@ import {
   GHOST_COPIES_OPTIONS,
   DEFAULT_SHEET_CONFIG,
   getAllowedColumnOptions,
+  getInitialColumnsForWidth,
   getMaxColumnsForFontSize,
   type SheetConfig,
 } from './sheetOptions'
@@ -102,6 +103,12 @@ describe('COLUMNS_OPTIONS', () => {
       3, 4, 5, 6, 7,
     ])
   })
+
+  it('derives initial columns from available width without exceeding the printable cap', () => {
+    expect(getInitialColumnsForWidth('medium', 120)).toBe(3)
+    expect(getInitialColumnsForWidth('medium', 500)).toBe(6)
+    expect(getInitialColumnsForWidth('medium', 1200)).toBe(9)
+  })
 })
 
 describe('GHOST_COPIES_OPTIONS', () => {
@@ -122,9 +129,9 @@ describe('DEFAULT_SHEET_CONFIG', () => {
     expect(c).toHaveProperty('fontSize')
   })
 
-  it('has sensible defaults (3 rows, 8 columns, 3 ghost copies)', () => {
+  it('has sensible defaults (3 rows, 3 columns, 3 ghost copies)', () => {
     expect(DEFAULT_SHEET_CONFIG.rowsPerCharacter).toBe(3)
-    expect(DEFAULT_SHEET_CONFIG.columns).toBe(8)
+    expect(DEFAULT_SHEET_CONFIG.columns).toBe(3)
     expect(DEFAULT_SHEET_CONFIG.ghostCopiesPerRow).toBeGreaterThanOrEqual(1)
   })
 

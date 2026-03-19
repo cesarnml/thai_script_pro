@@ -7,6 +7,7 @@ import { useContentSelection } from './hooks/useContentSelection'
 import {
   DEFAULT_SHEET_CONFIG,
   FONT_FAMILY_MAP,
+  getInitialColumnsForWidth,
   getMaxColumnsForFontSize,
 } from './data/sheetOptions'
 import type { SheetConfig } from './data/sheetOptions'
@@ -28,7 +29,33 @@ function App() {
   const [sheetConfig, setSheetConfig] = useState<SheetConfig>(DEFAULT_SHEET_CONFIG)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const toastTimeoutRef = useRef<number | null>(null)
+  const previewRootRef = useRef<HTMLDivElement>(null)
+  const hasInitializedColumnsRef = useRef(false)
   const selectedFontFamily = FONT_FAMILY_MAP[sheetConfig.font] || '"Sarabun", sans-serif'
+
+  useEffect(() => {
+    if (hasInitializedColumnsRef.current) return
+
+    const previewRoot = previewRootRef.current
+    const previewSurface = previewRoot?.querySelector<HTMLElement>('[data-preview-surface="true"]')
+    if (!previewSurface) return
+
+    const styles = window.getComputedStyle(previewSurface)
+    const paddingLeft = Number.parseFloat(styles.paddingLeft) || 0
+    const paddingRight = Number.parseFloat(styles.paddingRight) || 0
+    const availableWidthPx = Math.max(0, previewSurface.clientWidth - paddingLeft - paddingRight)
+    const initialColumns = getInitialColumnsForWidth(sheetConfig.fontSize, availableWidthPx)
+
+    hasInitializedColumnsRef.current = true
+
+    if (initialColumns === sheetConfig.columns) return
+
+    setSheetConfig((current) => ({
+      ...current,
+      columns: initialColumns,
+      ghostCopiesPerRow: Math.min(current.ghostCopiesPerRow, initialColumns),
+    }))
+  }, [sheetConfig.columns, sheetConfig.fontSize])
 
   useEffect(() => {
     if (!toastMessage) return
@@ -111,7 +138,7 @@ function App() {
           <OutputActions onDownloadPdf={handleDownloadPdf} />
         </div>
 
-        <div data-live-preview-root="true">
+        <div ref={previewRootRef} data-live-preview-root="true">
           <Preview
             selectedConsonantIds={selection.selectedConsonantIds}
             selectedVowelIds={selection.selectedVowelIds}
