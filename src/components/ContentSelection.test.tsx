@@ -13,9 +13,20 @@ describe('ContentSelection', () => {
 
   it('renders all 44 consonant items', () => {
     const { container } = render(<ContentSelection />)
-    const consonantGrid = container.querySelectorAll('.grid.grid-cols-10')[0]
+    const consonantGrid = container.querySelector('[data-consonant-grid="true"]')
+    if (!consonantGrid) throw new Error('Expected consonant grid to be rendered')
     const buttons = consonantGrid.querySelectorAll('button')
     expect(buttons).toHaveLength(44)
+  })
+
+  it('uses a 55px minimum width for consonant cells on smaller screens', () => {
+    const { container } = render(<ContentSelection />)
+    const consonantGrid = container.querySelector('[data-consonant-grid="true"]')
+
+    if (!consonantGrid) throw new Error('Expected consonant grid to be rendered')
+    expect(consonantGrid).toHaveClass(
+      '[grid-template-columns:repeat(auto-fit,minmax(55px,1fr))]'
+    )
   })
 
   it('clicking a consonant toggles selection and updates summary', async () => {

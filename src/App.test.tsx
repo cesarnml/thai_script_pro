@@ -104,9 +104,7 @@ describe('App', () => {
 
     expect(screen.getByLabelText(/^columns$/i)).toHaveValue('7')
     expect(screen.getByLabelText(/^ghost copies$/i)).toHaveValue('7')
-    expect(
-      screen.getByText('Columns reduced to 7 for Large to fit the page width.')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Adjusted to 7 columns so it fits on the page.')).toBeInTheDocument()
   })
 
   it('keeps the toast visible for 5 seconds before auto-dismissing', async () => {
@@ -117,23 +115,17 @@ describe('App', () => {
     fireEvent.change(screen.getByLabelText(/^columns$/i), { target: { value: '12' } })
     fireEvent.change(screen.getByLabelText(/font size/i), { target: { value: 'large' } })
 
-    expect(
-      screen.getByText('Columns reduced to 7 for Large to fit the page width.')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Adjusted to 7 columns so it fits on the page.')).toBeInTheDocument()
 
     act(() => {
       vi.advanceTimersByTime(4900)
     })
-    expect(
-      screen.getByText('Columns reduced to 7 for Large to fit the page width.')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Adjusted to 7 columns so it fits on the page.')).toBeInTheDocument()
 
     act(() => {
       vi.advanceTimersByTime(100)
     })
-    expect(
-      screen.queryByText('Columns reduced to 7 for Large to fit the page width.')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Adjusted to 7 columns so it fits on the page.')).not.toBeInTheDocument()
   })
 
   it('allows the user to dismiss the clamp toast immediately', async () => {
@@ -144,15 +136,11 @@ describe('App', () => {
     fireEvent.change(screen.getByLabelText(/^columns$/i), { target: { value: '9' } })
     fireEvent.change(screen.getByLabelText(/font size/i), { target: { value: 'large' } })
 
-    expect(
-      screen.getByText('Columns reduced to 7 for Large to fit the page width.')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Adjusted to 7 columns so it fits on the page.')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /dismiss notification/i }))
 
-    expect(
-      screen.queryByText('Columns reduced to 7 for Large to fit the page width.')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Adjusted to 7 columns so it fits on the page.')).not.toBeInTheDocument()
   })
 
   it('does not show a toast when the selected columns already fit the new font size', async () => {
@@ -162,8 +150,6 @@ describe('App', () => {
     await user.selectOptions(screen.getByLabelText(/^columns$/i), '7')
     await user.selectOptions(screen.getByLabelText(/font size/i), 'large')
 
-    expect(
-      screen.queryByText('Columns reduced to 7 for Large to fit the page width.')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Adjusted to 7 columns so it fits on the page.')).not.toBeInTheDocument()
   })
 })

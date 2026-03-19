@@ -63,7 +63,10 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-10 gap-2">
+        <div
+          className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(55px,1fr))] md:[grid-template-columns:repeat(10,minmax(0,1fr))]"
+          data-consonant-grid="true"
+        >
           {THAI_CONSONANTS.map((c) => (
             <button
               key={c.id}

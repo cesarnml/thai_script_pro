@@ -7,7 +7,6 @@ import { useContentSelection } from './hooks/useContentSelection'
 import {
   DEFAULT_SHEET_CONFIG,
   FONT_FAMILY_MAP,
-  FONT_SIZE_OPTIONS,
   getMaxColumnsForFontSize,
 } from './data/sheetOptions'
 import type { SheetConfig } from './data/sheetOptions'
@@ -62,12 +61,7 @@ function App() {
       nextConfig.fontSize !== sheetConfig.fontSize &&
       normalizedConfig.columns !== sheetConfig.columns
     ) {
-      const fontSizeLabel =
-        FONT_SIZE_OPTIONS.find((option) => option.id === normalizedConfig.fontSize)?.label ??
-        normalizedConfig.fontSize
-      setToastMessage(
-        `Columns reduced to ${normalizedConfig.columns} for ${fontSizeLabel} to fit the page width.`
-      )
+      setToastMessage(`Adjusted to ${normalizedConfig.columns} columns so it fits on the page.`)
     }
 
     setSheetConfig(normalizedConfig)
