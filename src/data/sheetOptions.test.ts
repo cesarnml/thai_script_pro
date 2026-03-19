@@ -27,21 +27,19 @@ describe('GRID_GUIDE_OPTIONS', () => {
 })
 
 describe('FONT_OPTIONS', () => {
-  it('has 5 font options', () => {
-    expect(FONT_OPTIONS).toHaveLength(5)
+  it('has 3 font options', () => {
+    expect(FONT_OPTIONS).toHaveLength(3)
   })
 
-  it('includes Noto Serif Thai as default', () => {
-    const notoSerif = FONT_OPTIONS.find((f) => f.label.includes('Noto Serif Thai'))
-    expect(notoSerif).toBeDefined()
-    expect(notoSerif?.isDefault).toBe(true)
+  it('includes Traditional as default', () => {
+    const traditional = FONT_OPTIONS.find((f) => f.label === 'Traditional')
+    expect(traditional).toBeDefined()
+    expect(traditional?.isDefault).toBe(true)
   })
 
-  it('includes Noto Sans Thai, Noto Sans Thai Looped, Mali, Playpen Sans Thai', () => {
+  it('includes Traditional, Modern, and Cursive', () => {
     const labels = FONT_OPTIONS.map((f) => f.label)
-    expect(labels.some((l) => l.includes('Noto Sans Thai'))).toBe(true)
-    expect(labels.some((l) => l.includes('Mali'))).toBe(true)
-    expect(labels.some((l) => l.includes('Playpen'))).toBe(true)
+    expect(labels).toEqual(['Traditional', 'Modern', 'Cursive'])
   })
 })
 
@@ -96,7 +94,7 @@ describe('DEFAULT_SHEET_CONFIG', () => {
     expect(DEFAULT_SHEET_CONFIG.ghostCopiesPerRow).toBeGreaterThanOrEqual(1)
   })
 
-  it('uses default font (Noto Serif Thai)', () => {
+  it('uses default font (Traditional)', () => {
     const defaultFont = FONT_OPTIONS.find((f) => f.isDefault)
     expect(defaultFont).toBeDefined()
     expect(DEFAULT_SHEET_CONFIG.font).toBe(defaultFont!.id)

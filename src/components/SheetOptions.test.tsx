@@ -115,7 +115,7 @@ describe('SheetOptions', () => {
     render(<SheetOptions config={DEFAULT_SHEET_CONFIG} onChange={mockOnChange} />)
     const fontSelect = screen.getByRole('combobox', { name: /^font$/i })
     expect(fontSelect).toBeInTheDocument()
-    expect(fontSelect).toHaveValue('noto-serif-thai')
+    expect(fontSelect).toHaveValue('traditional')
   })
 
   it('renders font size dropdown', () => {

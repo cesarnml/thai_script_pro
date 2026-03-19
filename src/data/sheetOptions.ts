@@ -30,11 +30,9 @@ export const GRID_GUIDE_OPTIONS: GridGuideOption[] = [
 ]
 
 export const FONT_OPTIONS: FontOption[] = [
-  { id: 'noto-sans-thai', label: 'Noto Sans Thai' },
-  { id: 'noto-sans-thai-looped', label: 'Noto Sans Thai Looped' },
-  { id: 'noto-serif-thai', label: 'Noto Serif Thai', isDefault: true },
-  { id: 'mali', label: 'Mali' },
-  { id: 'playpen-sans-thai', label: 'Playpen Sans Thai' },
+  { id: 'traditional', label: 'Traditional', isDefault: true },
+  { id: 'modern', label: 'Modern' },
+  { id: 'cursive', label: 'Cursive' },
 ]
 
 export const FONT_SIZE_OPTIONS: FontSizeOption[] = [
@@ -83,11 +81,9 @@ export const FONT_SIZE_MAP: Record<string, { text: number; cellPx: number }> = {
 }
 
 export const FONT_FAMILY_MAP: Record<string, string> = {
-  'noto-sans-thai': '"Noto Sans Thai", sans-serif',
-  'noto-sans-thai-looped': '"Noto Sans Thai Looped", sans-serif',
-  'noto-serif-thai': '"Noto Serif Thai", serif',
-  'mali': '"Mali", cursive',
-  'playpen-sans-thai': '"Playpen Sans", cursive',
+  traditional: '"Sarabun", sans-serif',
+  modern: '"Prompt", sans-serif',
+  cursive: '"Itim", cursive',
 }
 
 const defaultFont = FONT_OPTIONS.find((f) => f.isDefault)!

@@ -135,4 +135,17 @@ describe('Preview', () => {
     expect(rowGrids[0].querySelectorAll('[data-char-overlay="true"]')).toHaveLength(4)
     expect(rowGrids[1].querySelectorAll('[data-char-overlay="true"]')).toHaveLength(4)
   })
+
+  it('shows the semantic font label in preview metadata', () => {
+    const config: SheetConfig = { ...DEFAULT_SHEET_CONFIG, font: 'modern' }
+    render(
+      <Preview
+        selectedConsonantIds={[THAI_CONSONANTS[0].id]}
+        selectedVowelIds={[]}
+        config={config}
+      />
+    )
+
+    expect(screen.getByRole('region', { name: /preview/i })).toHaveTextContent('Modern')
+  })
 })

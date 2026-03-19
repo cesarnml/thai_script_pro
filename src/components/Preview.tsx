@@ -143,8 +143,8 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
   const consonants = THAI_CONSONANTS.filter((c) => selectedConsonantIds.includes(c.id))
   const vowels = THAI_VOWELS.filter((v) => selectedVowelIds.includes(v.id))
 
-  const fontFamily = FONT_FAMILY_MAP[config.font] || '"Noto Serif Thai", serif'
-  const fontLabel = FONT_OPTIONS.find((f) => f.id === config.font)?.label || 'Noto Serif Thai'
+  const fontFamily = FONT_FAMILY_MAP[config.font] || '"Sarabun", sans-serif'
+  const fontLabel = FONT_OPTIONS.find((f) => f.id === config.font)?.label || 'Traditional'
   const totalChars = consonants.length + vowels.length
   const charType =
     consonants.length > 0 && vowels.length > 0
