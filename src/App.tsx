@@ -62,6 +62,8 @@ function App() {
       </div>
 
       <main className="max-w-5xl mx-auto px-4 pb-16 space-y-6">
+        <SheetOptions config={sheetConfig} onChange={setSheetConfig} />
+
         <ContentSelection
           selectedConsonantIds={selection.selectedConsonantIds}
           selectedVowelIds={selection.selectedVowelIds}
@@ -72,8 +74,6 @@ function App() {
           onSelectAllVowels={selection.selectAllVowels}
           onClearVowels={selection.clearVowels}
         />
-
-        <SheetOptions config={sheetConfig} onChange={setSheetConfig} />
 
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Preview</h2>
