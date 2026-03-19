@@ -26,7 +26,7 @@ export interface SheetConfig {
 export const GRID_GUIDE_OPTIONS: GridGuideOption[] = [
   { id: 'cross', label: 'Cross' },
   { id: 'sandwich', label: 'Sandwich' },
-  { id: 'thai', label: 'Thai (3 lines)' },
+  { id: 'thai', label: 'Thai' },
 ]
 
 export const FONT_OPTIONS: FontOption[] = [
@@ -36,9 +36,9 @@ export const FONT_OPTIONS: FontOption[] = [
 ]
 
 export const FONT_SIZE_OPTIONS: FontSizeOption[] = [
-  { id: 'small', label: 'Small (24pt)' },
-  { id: 'medium', label: 'Medium (36pt)' },
-  { id: 'large', label: 'Large (48pt)' },
+  { id: 'small', label: 'Small' },
+  { id: 'medium', label: 'Medium' },
+  { id: 'large', label: 'Large' },
 ]
 
 export const ROWS_PER_CHARACTER_OPTIONS = [
@@ -53,12 +53,16 @@ export const ROWS_PER_CHARACTER_OPTIONS = [
 ]
 
 export const COLUMNS_OPTIONS = [
+  { value: 3, label: '3 columns' },
+  { value: 4, label: '4 columns' },
   { value: 5, label: '5 columns' },
   { value: 6, label: '6 columns' },
   { value: 7, label: '7 columns' },
   { value: 8, label: '8 columns' },
   { value: 9, label: '9 columns' },
   { value: 10, label: '10 columns' },
+  { value: 11, label: '11 columns' },
+  { value: 12, label: '12 columns' },
 ]
 
 export const GHOST_COPIES_OPTIONS = [
@@ -80,10 +84,31 @@ export const FONT_SIZE_MAP: Record<string, { text: number; cellPx: number }> = {
   large: { text: 48, cellPx: 100 },
 }
 
+export const PDF_A4_WIDTH_PT = 595.28
+export const PDF_LETTER_WIDTH_PT = 612
+export const PDF_PAGE_MARGIN_X_PT = 28
+export const PX_TO_PT = 0.75
+
 export const FONT_FAMILY_MAP: Record<string, string> = {
   traditional: '"Sarabun", sans-serif',
   modern: '"Prompt", sans-serif',
   cursive: '"Itim", cursive',
+}
+
+export function getMaxColumnsForFontSize(fontSize: string): number {
+  const cellPx = (FONT_SIZE_MAP[fontSize] || FONT_SIZE_MAP.medium).cellPx
+  const narrowestPageWidthPt = Math.min(PDF_A4_WIDTH_PT, PDF_LETTER_WIDTH_PT)
+  const printableWidthPx = (narrowestPageWidthPt - PDF_PAGE_MARGIN_X_PT * 2) / PX_TO_PT
+  const computedMax = Math.floor(printableWidthPx / cellPx)
+  const maxConfigured = COLUMNS_OPTIONS[COLUMNS_OPTIONS.length - 1].value
+  const minConfigured = COLUMNS_OPTIONS[0].value
+
+  return Math.max(minConfigured, Math.min(computedMax, maxConfigured))
+}
+
+export function getAllowedColumnOptions(fontSize: string) {
+  const maxColumns = getMaxColumnsForFontSize(fontSize)
+  return COLUMNS_OPTIONS.filter((option) => option.value <= maxColumns)
 }
 
 const defaultFont = FONT_OPTIONS.find((f) => f.isDefault)!

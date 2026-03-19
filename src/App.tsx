@@ -1,31 +1,76 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ContentSelection } from './components/ContentSelection'
 import { SheetOptions } from './components/SheetOptions'
 import { Preview } from './components/Preview'
 import { OutputActions } from './components/OutputActions'
 import { useContentSelection } from './hooks/useContentSelection'
-import { DEFAULT_SHEET_CONFIG, FONT_FAMILY_MAP } from './data/sheetOptions'
+import {
+  DEFAULT_SHEET_CONFIG,
+  FONT_FAMILY_MAP,
+  FONT_SIZE_OPTIONS,
+  getMaxColumnsForFontSize,
+} from './data/sheetOptions'
 import type { SheetConfig } from './data/sheetOptions'
 import { downloadPracticePdf } from './pdf/downloadPracticePdf'
+
+function normalizeSheetConfig(config: SheetConfig): SheetConfig {
+  const maxColumns = getMaxColumnsForFontSize(config.fontSize)
+  const columns = Math.min(config.columns, maxColumns)
+
+  return {
+    ...config,
+    columns,
+    ghostCopiesPerRow: Math.min(config.ghostCopiesPerRow, columns),
+  }
+}
 
 function App() {
   const selection = useContentSelection()
   const [sheetConfig, setSheetConfig] = useState<SheetConfig>(DEFAULT_SHEET_CONFIG)
-  const previewRef = useRef<HTMLDivElement>(null)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const toastTimeoutRef = useRef<number | null>(null)
   const selectedFontFamily = FONT_FAMILY_MAP[sheetConfig.font] || '"Sarabun", sans-serif'
 
-  const handlePrint = () => {
-    const el = previewRef.current
-    if (!el) return
+  useEffect(() => {
+    if (!toastMessage) return
 
-    document.body.classList.add('print-preview-active')
+    toastTimeoutRef.current = window.setTimeout(() => {
+      setToastMessage(null)
+      toastTimeoutRef.current = null
+    }, 5000)
 
-    const cleanup = () => {
-      document.body.classList.remove('print-preview-active')
+    return () => {
+      if (toastTimeoutRef.current !== null) {
+        window.clearTimeout(toastTimeoutRef.current)
+        toastTimeoutRef.current = null
+      }
+    }
+  }, [toastMessage])
+
+  const dismissToast = () => {
+    if (toastTimeoutRef.current !== null) {
+      window.clearTimeout(toastTimeoutRef.current)
+      toastTimeoutRef.current = null
+    }
+    setToastMessage(null)
+  }
+
+  const handleSheetConfigChange = (nextConfig: SheetConfig) => {
+    const normalizedConfig = normalizeSheetConfig(nextConfig)
+
+    if (
+      nextConfig.fontSize !== sheetConfig.fontSize &&
+      normalizedConfig.columns !== sheetConfig.columns
+    ) {
+      const fontSizeLabel =
+        FONT_SIZE_OPTIONS.find((option) => option.id === normalizedConfig.fontSize)?.label ??
+        normalizedConfig.fontSize
+      setToastMessage(
+        `Columns reduced to ${normalizedConfig.columns} for ${fontSizeLabel} to fit the page width.`
+      )
     }
 
-    window.addEventListener('afterprint', cleanup, { once: true })
-    window.print()
+    setSheetConfig(normalizedConfig)
   }
 
   const handleDownloadPdf = async () => {
@@ -53,7 +98,7 @@ function App() {
       </div>
 
       <main className="max-w-5xl mx-auto px-4 pb-16 space-y-6">
-        <SheetOptions config={sheetConfig} onChange={setSheetConfig} />
+        <SheetOptions config={sheetConfig} onChange={handleSheetConfigChange} />
 
         <ContentSelection
           selectedConsonantIds={selection.selectedConsonantIds}
@@ -69,10 +114,10 @@ function App() {
 
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Preview</h2>
-          <OutputActions onPrint={handlePrint} onDownloadPdf={handleDownloadPdf} />
+          <OutputActions onDownloadPdf={handleDownloadPdf} />
         </div>
 
-        <div ref={previewRef} className="print-preview-root" data-live-preview-root="true">
+        <div data-live-preview-root="true">
           <Preview
             selectedConsonantIds={selection.selectedConsonantIds}
             selectedVowelIds={selection.selectedVowelIds}
@@ -80,6 +125,31 @@ function App() {
           />
         </div>
       </main>
+
+      {toastMessage ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-4 left-1/2 z-50 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-3 rounded-2xl bg-slate-900/95 px-4 py-2 text-sm text-white shadow-lg"
+        >
+          <span>{toastMessage}</span>
+          <button
+            type="button"
+            aria-label="Dismiss notification"
+            onClick={dismissToast}
+            className="rounded-full p-1 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+      ) : null}
     </div>
   )
 }

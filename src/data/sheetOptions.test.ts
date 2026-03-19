@@ -7,6 +7,8 @@ import {
   FONT_SIZE_OPTIONS,
   GHOST_COPIES_OPTIONS,
   DEFAULT_SHEET_CONFIG,
+  getAllowedColumnOptions,
+  getMaxColumnsForFontSize,
   type SheetConfig,
 } from './sheetOptions'
 
@@ -16,7 +18,7 @@ describe('GRID_GUIDE_OPTIONS', () => {
     const labels = GRID_GUIDE_OPTIONS.map((o) => o.label)
     expect(labels).toContain('Cross')
     expect(labels).toContain('Sandwich')
-    expect(labels).toContain('Thai (3 lines)')
+    expect(labels).toContain('Thai')
   })
 
   it('each option has id and label', () => {
@@ -45,8 +47,13 @@ describe('FONT_OPTIONS', () => {
 })
 
 describe('FONT_SIZE_OPTIONS', () => {
-  it('has at least 3 options (e.g. Small, Medium, Large)', () => {
-    expect(FONT_SIZE_OPTIONS.length).toBeGreaterThanOrEqual(3)
+  it('has exactly 3 simplified labels', () => {
+    expect(FONT_SIZE_OPTIONS).toHaveLength(3)
+    expect(FONT_SIZE_OPTIONS.map((option) => option.label)).toEqual([
+      'Small',
+      'Medium',
+      'Large',
+    ])
   })
 
   it('each has id and label', () => {
@@ -66,9 +73,9 @@ describe('FONT_SIZE_MAP', () => {
 })
 
 describe('COLUMNS_OPTIONS', () => {
-  it('includes columns 5 through 10', () => {
+  it('includes columns 3 through 12', () => {
     const values = COLUMNS_OPTIONS.map((o) => o.value)
-    expect(values).toEqual([5, 6, 7, 8, 9, 10])
+    expect(values).toEqual([3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
   })
 
   it('each has value and label', () => {
@@ -76,6 +83,24 @@ describe('COLUMNS_OPTIONS', () => {
       expect(opt).toHaveProperty('value')
       expect(opt).toHaveProperty('label')
     }
+  })
+
+  it('derives the max allowed columns from printable width for each font size', () => {
+    expect(getMaxColumnsForFontSize('small')).toBe(12)
+    expect(getMaxColumnsForFontSize('medium')).toBe(9)
+    expect(getMaxColumnsForFontSize('large')).toBe(7)
+  })
+
+  it('filters the rendered column options to the allowed max', () => {
+    expect(getAllowedColumnOptions('small').map((option) => option.value)).toEqual([
+      3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+    ])
+    expect(getAllowedColumnOptions('medium').map((option) => option.value)).toEqual([
+      3, 4, 5, 6, 7, 8, 9,
+    ])
+    expect(getAllowedColumnOptions('large').map((option) => option.value)).toEqual([
+      3, 4, 5, 6, 7,
+    ])
   })
 })
 

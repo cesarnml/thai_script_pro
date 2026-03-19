@@ -162,7 +162,7 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
         </div>
       ) : (
         <div
-          className="bg-white rounded-2xl border border-gray-200 shadow-sm py-10 px-8 md:px-12"
+          className="relative bg-white rounded-2xl border border-gray-200 shadow-sm py-10 px-8 md:px-12"
           style={{ fontFamily }}
         >
           <h3
@@ -177,36 +177,41 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
             Practice &middot; {totalChars} {charType} &middot; {fontLabel}
           </p>
 
-          <div className="space-y-8">
-            {consonants.map((c) => (
-              <div key={c.id}>
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className="text-lg font-bold text-gray-900" translate="no" lang="th">
-                    {c.char}
-                  </span>
-                  <span
-                    className="text-sm text-indigo-500 font-medium"
-                    translate="no"
-                    lang="th"
-                  >
-                    {c.char}อ {c.name}
-                  </span>
+          <div
+            className="overflow-x-auto pb-2"
+            data-preview-scroll="true"
+          >
+            <div className="min-w-max space-y-8" data-preview-scroll-content="true">
+              {consonants.map((c) => (
+                <div key={c.id}>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className="text-lg font-bold text-gray-900" translate="no" lang="th">
+                      {c.char}
+                    </span>
+                    <span
+                      className="text-sm text-indigo-500 font-medium"
+                      translate="no"
+                      lang="th"
+                    >
+                      {c.char}อ {c.name}
+                    </span>
+                  </div>
+                  <PracticeGrid char={c.char} config={config} />
                 </div>
-                <PracticeGrid char={c.char} config={config} />
-              </div>
-            ))}
+              ))}
 
-            {vowels.map((v) => (
-              <div key={v.id}>
-                <div className="flex items-baseline gap-2 mb-2">
-                  <VowelDisplay
-                    char={v.char}
-                    className="text-lg font-bold text-gray-900"
-                  />
+              {vowels.map((v) => (
+                <div key={v.id}>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <VowelDisplay
+                      char={v.char}
+                      className="text-lg font-bold text-gray-900"
+                    />
+                  </div>
+                  <PracticeGrid char={v.char} isVowel config={config} />
                 </div>
-                <PracticeGrid char={v.char} isVowel config={config} />
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}

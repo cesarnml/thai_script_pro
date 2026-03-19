@@ -1,11 +1,11 @@
 import type { SheetConfig } from '../data/sheetOptions'
 import {
-  COLUMNS_OPTIONS,
   GRID_GUIDE_OPTIONS,
   FONT_OPTIONS,
   FONT_SIZE_OPTIONS,
   ROWS_PER_CHARACTER_OPTIONS,
   GHOST_COPIES_OPTIONS,
+  getAllowedColumnOptions,
 } from '../data/sheetOptions'
 
 interface SheetOptionsProps {
@@ -20,12 +20,18 @@ const labelClasses =
   'block text-[10px] font-semibold tracking-widest text-gray-400 uppercase mb-1.5'
 
 export function SheetOptions({ config, onChange }: SheetOptionsProps) {
+  const allowedColumnOptions = getAllowedColumnOptions(config.fontSize)
+  const fallbackColumns = allowedColumnOptions[allowedColumnOptions.length - 1]?.value ?? config.columns
+  const selectedColumns = allowedColumnOptions.some((option) => option.value === config.columns)
+    ? config.columns
+    : fallbackColumns
+
   const update = (partial: Partial<SheetConfig>) => {
     onChange({ ...config, ...partial })
   }
 
   const handleColumnsChange = (value: string) => {
-    const columns = Number(value) || COLUMNS_OPTIONS[COLUMNS_OPTIONS.length - 1].value
+    const columns = Number(value) || fallbackColumns
     update({
       columns,
       ghostCopiesPerRow: Math.min(config.ghostCopiesPerRow, columns),
@@ -61,11 +67,11 @@ export function SheetOptions({ config, onChange }: SheetOptionsProps) {
           </label>
           <select
             id="columns"
-            value={config.columns}
+            value={selectedColumns}
             onChange={(e) => handleColumnsChange(e.target.value)}
             className={selectClasses}
           >
-            {COLUMNS_OPTIONS.map((o) => (
+            {allowedColumnOptions.map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>

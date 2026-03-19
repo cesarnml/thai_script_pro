@@ -102,6 +102,52 @@ describe('SheetOptions', () => {
     )
   })
 
+  it('omits 10 columns for the medium font size', () => {
+    render(<SheetOptions config={DEFAULT_SHEET_CONFIG} onChange={mockOnChange} />)
+
+    expect(screen.getByRole('option', { name: '3 columns' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: '9 columns' })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: '10 columns' })).not.toBeInTheDocument()
+  })
+
+  it('limits large font size to 3 through 7 columns', () => {
+    render(
+      <SheetOptions
+        config={{ ...DEFAULT_SHEET_CONFIG, fontSize: 'large', columns: 7 }}
+        onChange={mockOnChange}
+      />
+    )
+
+    expect(screen.getByRole('option', { name: '3 columns' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: '4 columns' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: '5 columns' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: '6 columns' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: '7 columns' })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: '8 columns' })).not.toBeInTheDocument()
+  })
+
+  it('exposes columns up to 12 for the small font size', () => {
+    render(
+      <SheetOptions
+        config={{ ...DEFAULT_SHEET_CONFIG, fontSize: 'small', columns: 12 }}
+        onChange={mockOnChange}
+      />
+    )
+
+    expect(screen.getByRole('option', { name: '12 columns' })).toBeInTheDocument()
+  })
+
+  it('falls back to the largest allowed column value if the current config is out of range', () => {
+    render(
+      <SheetOptions
+        config={{ ...DEFAULT_SHEET_CONFIG, fontSize: 'large', columns: 8 }}
+        onChange={mockOnChange}
+      />
+    )
+
+    expect(screen.getByLabelText(/^columns$/i)).toHaveValue('7')
+  })
+
   it('renders grid guide dropdown with 3 options', () => {
     render(<SheetOptions config={DEFAULT_SHEET_CONFIG} onChange={mockOnChange} />)
     const gridSelect = screen.getByLabelText(/grid guide/i)
@@ -109,6 +155,7 @@ describe('SheetOptions', () => {
     const options = screen.getAllByRole('option')
     const gridOptions = options.filter((o) => o.getAttribute('value')?.match(/cross|sandwich|thai/))
     expect(gridOptions.length).toBeGreaterThanOrEqual(3)
+    expect(screen.getByRole('option', { name: 'Thai' })).toBeInTheDocument()
   })
 
   it('renders font dropdown with default selected', () => {
@@ -121,5 +168,8 @@ describe('SheetOptions', () => {
   it('renders font size dropdown', () => {
     render(<SheetOptions config={DEFAULT_SHEET_CONFIG} onChange={mockOnChange} />)
     expect(screen.getByLabelText(/font size/i)).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Small' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Medium' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Large' })).toBeInTheDocument()
   })
 })

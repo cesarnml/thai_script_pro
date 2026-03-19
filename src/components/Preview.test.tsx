@@ -115,6 +115,27 @@ describe('Preview', () => {
     expect(rowGrids[1]).toHaveStyle({ gridTemplateColumns: 'repeat(7, 76px)' })
   })
 
+  it('keeps rendering the full configured column count inside the scrollable preview', () => {
+    const config: SheetConfig = {
+      ...DEFAULT_SHEET_CONFIG,
+      fontSize: 'small',
+      columns: 12,
+      ghostCopiesPerRow: 3,
+    }
+    const { container } = render(
+      <Preview
+        selectedConsonantIds={[THAI_CONSONANTS[0].id]}
+        selectedVowelIds={[]}
+        config={config}
+      />
+    )
+
+    const rowGrid = container.querySelector('div[style*="grid-template-columns"]')
+    expect(rowGrid).not.toBeNull()
+    expect(rowGrid).toHaveStyle({ gridTemplateColumns: 'repeat(12, 56px)' })
+    expect(container.querySelector('[data-preview-scroll="true"]')).not.toBeNull()
+  })
+
   it('uses 100px cells for the large font size', () => {
     const config: SheetConfig = {
       ...DEFAULT_SHEET_CONFIG,
@@ -240,5 +261,31 @@ describe('Preview', () => {
     expect(consonantName).toHaveAttribute('translate', 'no')
     expect(consonantName).toHaveAttribute('lang', 'th')
     expect(vowelGlyphWrapper).not.toBeNull()
+  })
+
+  it('renders the preview inside a horizontal scroll container', () => {
+    const { container } = render(
+      <Preview
+        selectedConsonantIds={[THAI_CONSONANTS[0].id]}
+        selectedVowelIds={[]}
+        config={{ ...DEFAULT_SHEET_CONFIG, fontSize: 'small', columns: 12 }}
+      />
+    )
+
+    const scrollContainer = container.querySelector('[data-preview-scroll="true"]')
+    expect(scrollContainer).not.toBeNull()
+    expect(scrollContainer).toHaveClass('overflow-x-auto')
+  })
+
+  it('does not render a horizontal-scroll warning message', () => {
+    render(
+      <Preview
+        selectedConsonantIds={[THAI_CONSONANTS[0].id]}
+        selectedVowelIds={[]}
+        config={{ ...DEFAULT_SHEET_CONFIG, fontSize: 'small', columns: 12 }}
+      />
+    )
+
+    expect(screen.queryByText(/scroll sideways to view all columns/i)).not.toBeInTheDocument()
   })
 })

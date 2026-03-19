@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { formatVowelWithPlaceholder } from './data/vowels'
 import { DEFAULT_SHEET_CONFIG } from './data/sheetOptions'
@@ -17,17 +17,15 @@ vi.mock('./pdf/downloadPracticePdf', () => ({
 import App from './App'
 
 describe('App', () => {
-  const originalPrint = window.print
-
   beforeEach(() => {
     vi.restoreAllMocks()
+    vi.useRealTimers()
     downloadPracticePdfMock.mockClear()
     downloadPracticePdfMock.mockResolvedValue(undefined)
   })
 
   afterEach(() => {
-    window.print = originalPrint
-    document.body.classList.remove('print-preview-active')
+    vi.useRealTimers()
   })
 
   it('renders app title Thai Script Pro', () => {
@@ -43,7 +41,6 @@ describe('App', () => {
     expect(contentSelectionHeading).toBeInTheDocument()
     expect(rowsSelect).toBeInTheDocument()
     expect(screen.getByRole('region', { name: /preview/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /print/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /download pdf/i })).toBeInTheDocument()
 
     const sheetOptionsSection = rowsSelect.closest('section')
@@ -63,21 +60,6 @@ describe('App', () => {
       sheetOptionsSection!.compareDocumentPosition(contentSelectionSection!) &
         Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy()
-  })
-
-  it('prints only the preview using print mode', async () => {
-    const user = userEvent.setup()
-    const addEventListenerSpy = vi.spyOn(window, 'addEventListener')
-    window.print = vi.fn()
-
-    render(<App />)
-    await user.click(screen.getByRole('button', { name: /print/i }))
-
-    expect(document.body.classList.contains('print-preview-active')).toBe(true)
-    expect(addEventListenerSpy).toHaveBeenCalledWith('afterprint', expect.any(Function), {
-      once: true,
-    })
-    expect(window.print).toHaveBeenCalledTimes(1)
   })
 
   it('downloads PDF through the native generator helper', async () => {
@@ -109,5 +91,79 @@ describe('App', () => {
     ).toHaveStyle({
       fontFamily: '"Itim", cursive',
     })
+  })
+
+  it('auto-clamps columns and ghost copies when switching to a larger font size', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.selectOptions(screen.getByLabelText(/font size/i), 'small')
+    await user.selectOptions(screen.getByLabelText(/^columns$/i), '12')
+    await user.selectOptions(screen.getByLabelText(/^ghost copies$/i), '10')
+    await user.selectOptions(screen.getByLabelText(/font size/i), 'large')
+
+    expect(screen.getByLabelText(/^columns$/i)).toHaveValue('7')
+    expect(screen.getByLabelText(/^ghost copies$/i)).toHaveValue('7')
+    expect(
+      screen.getByText('Columns reduced to 7 for Large to fit the page width.')
+    ).toBeInTheDocument()
+  })
+
+  it('keeps the toast visible for 5 seconds before auto-dismissing', async () => {
+    vi.useFakeTimers()
+    render(<App />)
+
+    fireEvent.change(screen.getByLabelText(/font size/i), { target: { value: 'small' } })
+    fireEvent.change(screen.getByLabelText(/^columns$/i), { target: { value: '12' } })
+    fireEvent.change(screen.getByLabelText(/font size/i), { target: { value: 'large' } })
+
+    expect(
+      screen.getByText('Columns reduced to 7 for Large to fit the page width.')
+    ).toBeInTheDocument()
+
+    act(() => {
+      vi.advanceTimersByTime(4900)
+    })
+    expect(
+      screen.getByText('Columns reduced to 7 for Large to fit the page width.')
+    ).toBeInTheDocument()
+
+    act(() => {
+      vi.advanceTimersByTime(100)
+    })
+    expect(
+      screen.queryByText('Columns reduced to 7 for Large to fit the page width.')
+    ).not.toBeInTheDocument()
+  })
+
+  it('allows the user to dismiss the clamp toast immediately', async () => {
+    vi.useFakeTimers()
+    render(<App />)
+
+    fireEvent.change(screen.getByLabelText(/font size/i), { target: { value: 'small' } })
+    fireEvent.change(screen.getByLabelText(/^columns$/i), { target: { value: '9' } })
+    fireEvent.change(screen.getByLabelText(/font size/i), { target: { value: 'large' } })
+
+    expect(
+      screen.getByText('Columns reduced to 7 for Large to fit the page width.')
+    ).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /dismiss notification/i }))
+
+    expect(
+      screen.queryByText('Columns reduced to 7 for Large to fit the page width.')
+    ).not.toBeInTheDocument()
+  })
+
+  it('does not show a toast when the selected columns already fit the new font size', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.selectOptions(screen.getByLabelText(/^columns$/i), '7')
+    await user.selectOptions(screen.getByLabelText(/font size/i), 'large')
+
+    expect(
+      screen.queryByText('Columns reduced to 7 for Large to fit the page width.')
+    ).not.toBeInTheDocument()
   })
 })

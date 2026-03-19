@@ -3,6 +3,8 @@ import { THAI_CONSONANTS } from '../data/consonants'
 import {
   DEFAULT_SHEET_CONFIG,
   FONT_SIZE_MAP,
+  PDF_PAGE_MARGIN_X_PT,
+  PX_TO_PT,
   type SheetConfig,
 } from '../data/sheetOptions'
 import { THAI_VOWELS, formatVowelWithPlaceholder } from '../data/vowels'
@@ -72,8 +74,6 @@ export interface PdfDocLike {
   text(text: string, x: number, y: number, options?: Record<string, unknown>): void
 }
 
-const PX_TO_PT = 0.75
-const PAGE_MARGIN_X = 28
 const FIRST_PAGE_TOP_Y = 48
 const OTHER_PAGE_TOP_Y = 40
 const PAGE_BOTTOM_MARGIN = 40
@@ -151,7 +151,7 @@ function getPdfLayout(doc: PdfDocLike, config: SheetConfig): PdfLayout {
   const pageWidth = doc.internal.pageSize.getWidth()
   const pageHeight = doc.internal.pageSize.getHeight()
   const rawCellSize = (FONT_SIZE_MAP[config.fontSize] || FONT_SIZE_MAP.medium).cellPx * PX_TO_PT
-  const maxGridWidth = pageWidth - PAGE_MARGIN_X * 2
+  const maxGridWidth = pageWidth - PDF_PAGE_MARGIN_X_PT * 2
   const gridScale = Math.min(1, maxGridWidth / (rawCellSize * config.columns))
   const cellSize = rawCellSize * gridScale
   const glyphFontSize =
@@ -160,10 +160,10 @@ function getPdfLayout(doc: PdfDocLike, config: SheetConfig): PdfLayout {
   return {
     pageWidth,
     pageHeight,
-    marginX: PAGE_MARGIN_X,
+    marginX: PDF_PAGE_MARGIN_X_PT,
     topY: FIRST_PAGE_TOP_Y,
     bottomMargin: PAGE_BOTTOM_MARGIN,
-    gridX: PAGE_MARGIN_X,
+    gridX: PDF_PAGE_MARGIN_X_PT,
     cellSize,
     glyphFontSize,
     headerPrimaryFontSize: Math.max(14, Math.min(18, glyphFontSize * 0.6)),
