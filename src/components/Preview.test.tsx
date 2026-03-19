@@ -111,8 +111,29 @@ describe('Preview', () => {
 
     const rowGrids = Array.from(container.querySelectorAll('div[style*="grid-template-columns"]'))
     expect(rowGrids).toHaveLength(2)
-    expect(rowGrids[0]).toHaveStyle({ gridTemplateColumns: 'repeat(7, 64px)' })
-    expect(rowGrids[1]).toHaveStyle({ gridTemplateColumns: 'repeat(7, 64px)' })
+    expect(rowGrids[0]).toHaveStyle({ gridTemplateColumns: 'repeat(7, 76px)' })
+    expect(rowGrids[1]).toHaveStyle({ gridTemplateColumns: 'repeat(7, 76px)' })
+  })
+
+  it('uses 100px cells for the large font size', () => {
+    const config: SheetConfig = {
+      ...DEFAULT_SHEET_CONFIG,
+      rowsPerCharacter: 1,
+      columns: 5,
+      ghostCopiesPerRow: 2,
+      fontSize: 'large',
+    }
+    const { container } = render(
+      <Preview
+        selectedConsonantIds={[THAI_CONSONANTS[0].id]}
+        selectedVowelIds={[]}
+        config={config}
+      />
+    )
+
+    const rowGrid = container.querySelector('div[style*="grid-template-columns"]')
+    expect(rowGrid).not.toBeNull()
+    expect(rowGrid).toHaveStyle({ gridTemplateColumns: 'repeat(5, 100px)' })
   })
 
   it('adds one extra ghost character after the first row', () => {
@@ -149,7 +170,7 @@ describe('Preview', () => {
     expect(screen.getByRole('region', { name: /preview/i })).toHaveTextContent('Modern')
   })
 
-  it('bottom-aligns and horizontally centers character overlays', () => {
+  it('centers character overlays both vertically and horizontally', () => {
     const { container } = render(
       <Preview
         selectedConsonantIds={[THAI_CONSONANTS[0].id]}
@@ -162,7 +183,7 @@ describe('Preview', () => {
     expect(overlay).not.toBeNull()
     expect(overlay).toHaveStyle({
       display: 'flex',
-      alignItems: 'flex-end',
+      alignItems: 'center',
       justifyContent: 'center',
     })
 
@@ -171,7 +192,7 @@ describe('Preview', () => {
     expect(inner).toHaveStyle({ textAlign: 'center' })
   })
 
-  it('keeps vowels inside the same bottom-aligned overlay container', () => {
+  it('keeps vowels inside the same centered overlay container', () => {
     const { container } = render(
       <Preview
         selectedConsonantIds={[]}
@@ -184,7 +205,7 @@ describe('Preview', () => {
     expect(overlay).not.toBeNull()
     expect(overlay).toHaveStyle({
       display: 'flex',
-      alignItems: 'flex-end',
+      alignItems: 'center',
       justifyContent: 'center',
     })
     expect(overlay?.textContent).toContain(formatVowelWithPlaceholder(THAI_VOWELS[0].char))

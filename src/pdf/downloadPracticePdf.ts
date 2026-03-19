@@ -305,9 +305,9 @@ function drawGridGlyph(
   doc.setFont(fontName)
   doc.setFontSize(layout.glyphFontSize)
   doc.setTextColor(...color)
-  doc.text(text, x + layout.cellSize / 2, y + layout.cellSize, {
+  doc.text(text, x + layout.cellSize / 2, y + layout.cellSize / 2, {
     align: 'center',
-    baseline: 'bottom',
+    baseline: 'middle',
   })
 }
 

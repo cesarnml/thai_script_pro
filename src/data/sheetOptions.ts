@@ -75,9 +75,9 @@ export const GHOST_COPIES_OPTIONS = [
 ]
 
 export const FONT_SIZE_MAP: Record<string, { text: number; cellPx: number }> = {
-  small: { text: 24, cellPx: 48 },
-  medium: { text: 36, cellPx: 64 },
-  large: { text: 48, cellPx: 80 },
+  small: { text: 24, cellPx: 56 },
+  medium: { text: 36, cellPx: 76 },
+  large: { text: 48, cellPx: 100 },
 }
 
 export const FONT_FAMILY_MAP: Record<string, string> = {

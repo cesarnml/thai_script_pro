@@ -49,7 +49,7 @@ function PracticeGrid({
     height: sz.cellPx,
     zIndex: 1,
     display: 'flex',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'center',
     fontSize: sz.text,
     fontFamily: 'inherit',

@@ -3,6 +3,7 @@ import {
   COLUMNS_OPTIONS,
   GRID_GUIDE_OPTIONS,
   FONT_OPTIONS,
+  FONT_SIZE_MAP,
   FONT_SIZE_OPTIONS,
   GHOST_COPIES_OPTIONS,
   DEFAULT_SHEET_CONFIG,
@@ -53,6 +54,14 @@ describe('FONT_SIZE_OPTIONS', () => {
       expect(opt).toHaveProperty('id')
       expect(opt).toHaveProperty('label')
     }
+  })
+})
+
+describe('FONT_SIZE_MAP', () => {
+  it('gives each size enough cell room for the current glyph widths', () => {
+    expect(FONT_SIZE_MAP.small).toEqual({ text: 24, cellPx: 56 })
+    expect(FONT_SIZE_MAP.medium).toEqual({ text: 36, cellPx: 76 })
+    expect(FONT_SIZE_MAP.large).toEqual({ text: 48, cellPx: 100 })
   })
 })
 

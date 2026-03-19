@@ -113,7 +113,7 @@ describe('buildPracticePdf', () => {
     expect(textRecords.some((record) => record.fontName === 'Prompt-Regular')).toBe(true)
   })
 
-  it('draws model glyphs centered with a bottom baseline', () => {
+  it('draws model glyphs centered with a middle baseline at the cell midpoint', () => {
     const { doc, textRecords } = createMockDoc()
     const config: SheetConfig = {
       ...DEFAULT_SHEET_CONFIG,
@@ -128,15 +128,21 @@ describe('buildPracticePdf', () => {
       config,
     })
 
+    const glyphFontSize =
+      (DEFAULT_SHEET_CONFIG.fontSize === 'medium' ? 36 : 36) * 0.75
+    const cellSize = 76 * 0.75
+    const expectedGlyphY = 96 + 24 + 8 + cellSize / 2
     const modelGlyph = textRecords.find(
       (record) =>
         record.text === firstConsonant.char &&
         record.fontName === 'Sarabun-SemiBold' &&
         record.options?.align === 'center' &&
-        record.options?.baseline === 'bottom'
+        record.options?.baseline === 'middle'
     )
 
     expect(modelGlyph).toBeDefined()
+    expect(modelGlyph?.fontSize).toBe(glyphFontSize)
+    expect(modelGlyph?.y).toBe(expectedGlyphY)
   })
 
   it('draws the correct guide line counts for each grid guide mode', () => {
@@ -190,7 +196,7 @@ describe('buildPracticePdf', () => {
         record.text === firstConsonant.char &&
         record.fontName === 'Sarabun-Regular' &&
         record.options?.align === 'center' &&
-        record.options?.baseline === 'bottom'
+        record.options?.baseline === 'middle'
     )
 
     expect(ghostGlyphs).toHaveLength(3)
@@ -215,6 +221,36 @@ describe('buildPracticePdf', () => {
       },
     })
 
-    expect(doc.addPage).toHaveBeenCalledTimes(1)
+    expect(doc.addPage).toHaveBeenCalledTimes(2)
+  })
+
+  it('uses the larger cell midpoint for large font glyph placement', () => {
+    const { doc, textRecords } = createMockDoc()
+    const config: SheetConfig = {
+      ...DEFAULT_SHEET_CONFIG,
+      fontSize: 'large',
+      rowsPerCharacter: 1,
+      columns: 5,
+      ghostCopiesPerRow: 1,
+    }
+
+    buildPracticePdf(doc, {
+      selectedConsonantIds: [firstConsonant.id],
+      selectedVowelIds: [],
+      config,
+    })
+
+    const largeCellSize = 100 * 0.75
+    const expectedGlyphY = 96 + 24 + 8 + largeCellSize / 2
+    const modelGlyph = textRecords.find(
+      (record) =>
+        record.text === firstConsonant.char &&
+        record.fontName === 'Sarabun-SemiBold' &&
+        record.options?.align === 'center' &&
+        record.options?.baseline === 'middle'
+    )
+
+    expect(modelGlyph).toBeDefined()
+    expect(modelGlyph?.y).toBe(expectedGlyphY)
   })
 })
