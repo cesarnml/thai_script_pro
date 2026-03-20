@@ -22,6 +22,10 @@ pnpm test      # run Vitest in watch mode
 pnpm test:run  # run Vitest once
 ```
 
+## Contributor conventions
+
+- Use Conventional Commit style for git commit messages, for example `feat: ...`, `fix: ...`, `refactor: ...`.
+
 ## Project layout
 
 - `src/data/` — Thai consonants, vowels, sheet options (constants + unit tests)
