@@ -21,4 +21,18 @@ describe('OutputActions', () => {
     await user.click(screen.getByRole('button', { name: /download pdf/i }))
     expect(mockOnDownloadPdf).toHaveBeenCalledTimes(1)
   })
+
+  it('renders a busy download state with a status message', () => {
+    render(
+      <OutputActions
+        onDownloadPdf={mockOnDownloadPdf}
+        isDownloading
+        downloadLabel="Preparing PDF..."
+        statusMessage="Preparing your PDF..."
+      />
+    )
+
+    expect(screen.getByRole('button', { name: /preparing pdf/i })).toBeDisabled()
+    expect(screen.getByRole('status')).toHaveTextContent('Preparing your PDF...')
+  })
 })

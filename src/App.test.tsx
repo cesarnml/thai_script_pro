@@ -16,6 +16,18 @@ vi.mock('./pdf/downloadPracticePdf', () => ({
 
 import App from './App'
 
+function createDeferred<T = void>() {
+  let resolve!: (value: T | PromiseLike<T>) => void
+  let reject!: (reason?: unknown) => void
+
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+
+  return { promise, resolve, reject }
+}
+
 describe('App', () => {
   const originalClientWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth')
 
@@ -24,6 +36,10 @@ describe('App', () => {
     vi.useRealTimers()
     downloadPracticePdfMock.mockClear()
     downloadPracticePdfMock.mockResolvedValue(undefined)
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback) => {
+      callback(0)
+      return 0
+    })
   })
 
   afterEach(() => {
@@ -76,11 +92,14 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: /download pdf/i }))
 
     expect(downloadPracticePdfMock).toHaveBeenCalledTimes(1)
-    expect(downloadPracticePdfMock).toHaveBeenCalledWith({
-      selectedConsonantIds: [],
-      selectedVowelIds: [],
-      config: DEFAULT_SHEET_CONFIG,
-    })
+    expect(downloadPracticePdfMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        selectedConsonantIds: [],
+        selectedVowelIds: [],
+        config: DEFAULT_SHEET_CONFIG,
+        onProgress: expect.any(Function),
+      })
+    )
   })
 
   it('grows the initial columns from 3 to the largest viewport-safe value on first load', async () => {
@@ -173,5 +192,64 @@ describe('App', () => {
     await user.selectOptions(screen.getByLabelText(/font size/i), 'large')
 
     expect(screen.queryByText('Adjusted to 7 columns so it fits on the page.')).not.toBeInTheDocument()
+  })
+
+  it('disables the download button and shows progress while the PDF is being prepared', async () => {
+    const deferred = createDeferred()
+    const user = userEvent.setup()
+
+    downloadPracticePdfMock.mockImplementation(async ({ onProgress }) => {
+      onProgress?.({ phase: 'generating', completed: 2, total: 5 })
+      return deferred.promise
+    })
+
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: /download pdf/i }))
+
+    expect(screen.getByRole('button', { name: /building 2\/5/i })).toBeDisabled()
+    expect(screen.getByText('Building your PDF pages (2 of 5)...')).toBeInTheDocument()
+
+    deferred.resolve(undefined)
+    await act(async () => {
+      await deferred.promise
+    })
+
+    expect(screen.getByRole('button', { name: /download pdf/i })).toBeEnabled()
+    expect(screen.getAllByRole('status').some((node) => node.textContent === '')).toBe(true)
+  })
+
+  it('shows an error toast if the PDF export fails', async () => {
+    const user = userEvent.setup()
+    downloadPracticePdfMock.mockRejectedValueOnce(new Error('network failure'))
+
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: /download pdf/i }))
+
+    expect(await screen.findByText('PDF export failed. Please try again.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /download pdf/i })).toBeEnabled()
+  })
+
+  it('does not start duplicate PDF exports while one is already in progress', async () => {
+    const deferred = createDeferred()
+    const user = userEvent.setup()
+
+    downloadPracticePdfMock.mockImplementation(async () => deferred.promise)
+
+    render(<App />)
+
+    const button = screen.getByRole('button', { name: /download pdf/i })
+    await user.click(button)
+    expect(screen.getByRole('button', { name: /preparing pdf/i })).toBeDisabled()
+
+    await user.click(screen.getByRole('button', { name: /preparing pdf/i }))
+
+    expect(downloadPracticePdfMock).toHaveBeenCalledTimes(1)
+
+    deferred.resolve(undefined)
+    await act(async () => {
+      await deferred.promise
+    })
   })
 })

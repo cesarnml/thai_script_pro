@@ -13,6 +13,33 @@ import {
 import type { SheetConfig } from './data/sheetOptions'
 import { downloadPracticePdf } from './pdf/downloadPracticePdf'
 
+type PdfExportPhase = 'idle' | 'preparing' | 'generating' | 'downloading' | 'error'
+
+interface PdfExportState {
+  phase: PdfExportPhase
+  label: string
+  statusMessage: string
+}
+
+const IDLE_PDF_EXPORT_STATE: PdfExportState = {
+  phase: 'idle',
+  label: 'Download PDF',
+  statusMessage: '',
+}
+
+async function waitForNextPaint(): Promise<void> {
+  if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+    await new Promise<void>((resolve) => {
+      window.requestAnimationFrame(() => resolve())
+    })
+    return
+  }
+
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 0)
+  })
+}
+
 function normalizeSheetConfig(config: SheetConfig): SheetConfig {
   const maxColumns = getMaxColumnsForFontSize(config.fontSize)
   const columns = Math.min(config.columns, maxColumns)
@@ -28,9 +55,11 @@ function App() {
   const selection = useContentSelection()
   const [sheetConfig, setSheetConfig] = useState<SheetConfig>(DEFAULT_SHEET_CONFIG)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [pdfExportState, setPdfExportState] = useState<PdfExportState>(IDLE_PDF_EXPORT_STATE)
   const toastTimeoutRef = useRef<number | null>(null)
   const previewRootRef = useRef<HTMLDivElement>(null)
   const hasInitializedColumnsRef = useRef(false)
+  const isPdfExportingRef = useRef(false)
   const selectedFontFamily = FONT_FAMILY_MAP[sheetConfig.font] || '"Sarabun", sans-serif'
 
   useEffect(() => {
@@ -94,12 +123,64 @@ function App() {
     setSheetConfig(normalizedConfig)
   }
 
-  const handleDownloadPdf = async () => {
-    await downloadPracticePdf({
-      selectedConsonantIds: selection.selectedConsonantIds,
-      selectedVowelIds: selection.selectedVowelIds,
-      config: sheetConfig,
+  const updatePdfExportState = (phase: Exclude<PdfExportPhase, 'idle' | 'error'>, completed?: number, total?: number) => {
+    if (phase === 'preparing') {
+      setPdfExportState({
+        phase,
+        label: 'Preparing PDF...',
+        statusMessage: 'Preparing your PDF...',
+      })
+      return
+    }
+
+    if (phase === 'generating') {
+      const hasProgress = typeof completed === 'number' && typeof total === 'number' && total > 0
+      setPdfExportState({
+        phase,
+        label: hasProgress ? `Building ${completed}/${total}` : 'Building PDF...',
+        statusMessage: hasProgress
+          ? `Building your PDF pages (${completed} of ${total})...`
+          : 'Building your PDF pages...',
+      })
+      return
+    }
+
+    setPdfExportState({
+      phase,
+      label: 'Starting download...',
+      statusMessage: 'Starting your PDF download...',
     })
+  }
+
+  const handleDownloadPdf = async () => {
+    if (isPdfExportingRef.current) return
+
+    isPdfExportingRef.current = true
+    updatePdfExportState('preparing')
+
+    try {
+      await waitForNextPaint()
+
+      await downloadPracticePdf({
+        selectedConsonantIds: selection.selectedConsonantIds,
+        selectedVowelIds: selection.selectedVowelIds,
+        config: sheetConfig,
+        onProgress: ({ phase, completed, total }) => {
+          updatePdfExportState(phase, completed, total)
+        },
+      })
+    } catch (error) {
+      console.error('PDF export failed', error)
+      setPdfExportState({
+        phase: 'error',
+        label: 'Download PDF',
+        statusMessage: '',
+      })
+      setToastMessage('PDF export failed. Please try again.')
+    } finally {
+      isPdfExportingRef.current = false
+      setPdfExportState(IDLE_PDF_EXPORT_STATE)
+    }
   }
 
   return (
@@ -135,7 +216,12 @@ function App() {
 
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Preview</h2>
-          <OutputActions onDownloadPdf={handleDownloadPdf} />
+          <OutputActions
+            onDownloadPdf={handleDownloadPdf}
+            isDownloading={pdfExportState.phase !== 'idle'}
+            downloadLabel={pdfExportState.label}
+            statusMessage={pdfExportState.statusMessage}
+          />
         </div>
 
         <div ref={previewRootRef} data-live-preview-root="true">

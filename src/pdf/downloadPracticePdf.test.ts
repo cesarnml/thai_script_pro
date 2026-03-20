@@ -1,11 +1,21 @@
 import { describe, it, expect, vi } from 'vitest'
 import { THAI_CONSONANTS } from '../data/consonants'
 import { DEFAULT_SHEET_CONFIG, type SheetConfig } from '../data/sheetOptions'
+import type { DownloadPracticePdfArgs } from './downloadPracticePdf'
 import {
   buildPracticePdf,
+  downloadPracticePdf,
   getGhostTextColor,
   type PdfDocLike,
 } from './downloadPracticePdf'
+
+const { jsPDFConstructorMock } = vi.hoisted(() => ({
+  jsPDFConstructorMock: vi.fn(),
+}))
+
+vi.mock('jspdf', () => ({
+  jsPDF: jsPDFConstructorMock,
+}))
 
 type TextRecord = {
   text: string
@@ -57,7 +67,7 @@ function createMockDoc(pageHeight = 841.89) {
       })
     }),
     rect: vi.fn(),
-    save: vi.fn(),
+    output: vi.fn(() => new Blob(['pdf'], { type: 'application/pdf' })),
     setDrawColor: vi.fn((r, g, b) => {
       currentDrawColor = [r, g, b]
     }),
@@ -93,7 +103,7 @@ function createMockDoc(pageHeight = 841.89) {
 describe('buildPracticePdf', () => {
   const firstConsonant = THAI_CONSONANTS[0]
 
-  it('maps the selected font to embedded PDF font names', () => {
+  it('maps the selected font to embedded PDF font names', async () => {
     const { doc, textRecords } = createMockDoc()
     const config: SheetConfig = {
       ...DEFAULT_SHEET_CONFIG,
@@ -103,7 +113,7 @@ describe('buildPracticePdf', () => {
       ghostCopiesPerRow: 1,
     }
 
-    buildPracticePdf(doc, {
+    await buildPracticePdf(doc, {
       selectedConsonantIds: [firstConsonant.id],
       selectedVowelIds: [],
       config,
@@ -113,7 +123,7 @@ describe('buildPracticePdf', () => {
     expect(textRecords.some((record) => record.fontName === 'Prompt-Regular')).toBe(true)
   })
 
-  it('draws model glyphs centered with a middle baseline at the cell midpoint', () => {
+  it('draws model glyphs centered with a middle baseline at the cell midpoint', async () => {
     const { doc, textRecords } = createMockDoc()
     const config: SheetConfig = {
       ...DEFAULT_SHEET_CONFIG,
@@ -122,7 +132,7 @@ describe('buildPracticePdf', () => {
       ghostCopiesPerRow: 1,
     }
 
-    buildPracticePdf(doc, {
+    await buildPracticePdf(doc, {
       selectedConsonantIds: [firstConsonant.id],
       selectedVowelIds: [],
       config,
@@ -145,11 +155,11 @@ describe('buildPracticePdf', () => {
     expect(modelGlyph?.y).toBe(expectedGlyphY)
   })
 
-  it('draws the correct guide line counts for each grid guide mode', () => {
-    const runGuideTest = (gridGuide: SheetConfig['gridGuide']) => {
+  it('draws the correct guide line counts for each grid guide mode', async () => {
+    const runGuideTest = async (gridGuide: SheetConfig['gridGuide']) => {
       const { doc, lineRecords } = createMockDoc()
 
-      buildPracticePdf(doc, {
+      await buildPracticePdf(doc, {
         selectedConsonantIds: [firstConsonant.id],
         selectedVowelIds: [],
         config: {
@@ -164,23 +174,23 @@ describe('buildPracticePdf', () => {
       return lineRecords
     }
 
-    const thaiLines = runGuideTest('thai')
+    const thaiLines = await runGuideTest('thai')
     expect(thaiLines).toHaveLength(3)
     expect(thaiLines.every((line) => line.color.join(',') === '200,230,201')).toBe(true)
 
-    const crossLines = runGuideTest('cross')
+    const crossLines = await runGuideTest('cross')
     expect(crossLines).toHaveLength(2)
     expect(crossLines.every((line) => line.color.join(',') === '224,224,224')).toBe(true)
 
-    const sandwichLines = runGuideTest('sandwich')
+    const sandwichLines = await runGuideTest('sandwich')
     expect(sandwichLines).toHaveLength(2)
     expect(sandwichLines.every((line) => line.color.join(',') === '224,224,224')).toBe(true)
   })
 
-  it('uses preblended ghost colors that follow the existing opacity progression', () => {
+  it('uses preblended ghost colors that follow the existing opacity progression', async () => {
     const { doc, textRecords } = createMockDoc()
 
-    buildPracticePdf(doc, {
+    await buildPracticePdf(doc, {
       selectedConsonantIds: [firstConsonant.id],
       selectedVowelIds: [],
       config: {
@@ -207,10 +217,10 @@ describe('buildPracticePdf', () => {
     ])
   })
 
-  it('adds a new page before a block that does not fit in the remaining space', () => {
+  it('adds a new page before a block that does not fit in the remaining space', async () => {
     const { doc } = createMockDoc(360)
 
-    buildPracticePdf(doc, {
+    await buildPracticePdf(doc, {
       selectedConsonantIds: [THAI_CONSONANTS[0].id, THAI_CONSONANTS[1].id],
       selectedVowelIds: [],
       config: {
@@ -224,7 +234,7 @@ describe('buildPracticePdf', () => {
     expect(doc.addPage).toHaveBeenCalledTimes(2)
   })
 
-  it('uses the larger cell midpoint for large font glyph placement', () => {
+  it('uses the larger cell midpoint for large font glyph placement', async () => {
     const { doc, textRecords } = createMockDoc()
     const config: SheetConfig = {
       ...DEFAULT_SHEET_CONFIG,
@@ -234,7 +244,7 @@ describe('buildPracticePdf', () => {
       ghostCopiesPerRow: 1,
     }
 
-    buildPracticePdf(doc, {
+    await buildPracticePdf(doc, {
       selectedConsonantIds: [firstConsonant.id],
       selectedVowelIds: [],
       config,
@@ -252,5 +262,93 @@ describe('buildPracticePdf', () => {
 
     expect(modelGlyph).toBeDefined()
     expect(modelGlyph?.y).toBe(expectedGlyphY)
+  })
+
+  it('emits generation progress while building large exports', async () => {
+    const { doc } = createMockDoc()
+    const progressStates: Array<{ phase: string; completed?: number; total?: number }> = []
+
+    const args: DownloadPracticePdfArgs = {
+      selectedConsonantIds: THAI_CONSONANTS.slice(0, 6).map((consonant) => consonant.id),
+      selectedVowelIds: [],
+      config: {
+        ...DEFAULT_SHEET_CONFIG,
+        rowsPerCharacter: 1,
+        columns: 5,
+        ghostCopiesPerRow: 1,
+      },
+      onProgress: (state) => {
+        progressStates.push(state)
+      },
+    }
+
+    await buildPracticePdf(doc, args)
+
+    expect(progressStates).toHaveLength(6)
+    expect(progressStates[0]).toEqual({ phase: 'generating', completed: 1, total: 6 })
+    expect(progressStates[progressStates.length - 1]).toEqual({
+      phase: 'generating',
+      completed: 6,
+      total: 6,
+    })
+  })
+})
+
+describe('downloadPracticePdf', () => {
+  it('reports progress phases in order and downloads via a blob URL', async () => {
+    const { doc } = createMockDoc()
+    const progressStates: string[] = []
+    const createObjectURL = vi.fn(() => 'blob:pdf')
+    const revokeObjectURL = vi.fn()
+    const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => new TextEncoder().encode('font').buffer,
+    })
+    const originalCreateObjectURL = URL.createObjectURL
+    const originalRevokeObjectURL = URL.revokeObjectURL
+
+    jsPDFConstructorMock.mockReturnValue(doc)
+    vi.stubGlobal('fetch', fetchMock)
+    Object.defineProperty(URL, 'createObjectURL', {
+      configurable: true,
+      value: createObjectURL,
+    })
+    Object.defineProperty(URL, 'revokeObjectURL', {
+      configurable: true,
+      value: revokeObjectURL,
+    })
+
+    await downloadPracticePdf({
+      selectedConsonantIds: [THAI_CONSONANTS[0].id, THAI_CONSONANTS[1].id],
+      selectedVowelIds: [],
+      config: DEFAULT_SHEET_CONFIG,
+      onProgress: ({ phase }) => {
+        progressStates.push(phase)
+      },
+    })
+
+    expect(progressStates[0]).toBe('preparing')
+    expect(progressStates).toContain('generating')
+    expect(progressStates[progressStates.length - 1]).toBe('downloading')
+    expect(doc.output).toHaveBeenCalledWith('blob')
+    expect(createObjectURL).toHaveBeenCalledTimes(1)
+    expect(anchorClick).toHaveBeenCalledTimes(1)
+
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 0)
+    })
+    expect(revokeObjectURL).toHaveBeenCalledTimes(1)
+
+    anchorClick.mockRestore()
+    vi.unstubAllGlobals()
+    Object.defineProperty(URL, 'createObjectURL', {
+      configurable: true,
+      value: originalCreateObjectURL,
+    })
+    Object.defineProperty(URL, 'revokeObjectURL', {
+      configurable: true,
+      value: originalRevokeObjectURL,
+    })
   })
 })

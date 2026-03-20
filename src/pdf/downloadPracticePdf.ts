@@ -13,6 +13,13 @@ export interface DownloadPracticePdfArgs {
   selectedConsonantIds: string[]
   selectedVowelIds: string[]
   config: SheetConfig
+  onProgress?: (state: PdfExportProgress) => void
+}
+
+export interface PdfExportProgress {
+  phase: 'preparing' | 'generating' | 'downloading'
+  completed?: number
+  total?: number
 }
 
 type RgbColor = [number, number, number]
@@ -64,7 +71,7 @@ export interface PdfDocLike {
   addPage(): void
   line(x1: number, y1: number, x2: number, y2: number): void
   rect(x: number, y: number, width: number, height: number): void
-  save(filename: string): void
+  output(type: 'blob'): Blob
   setDrawColor(r: number, g: number, b: number): void
   setFont(fontName: string, fontStyle?: string): void
   setFontSize(size: number): void
@@ -91,6 +98,7 @@ const SUBTITLE_COLOR: RgbColor = [156, 163, 175]
 const GHOST_BASE_COLOR: RgbColor = [156, 163, 175]
 const PDF_FILENAME = 'thai-script-practice.pdf'
 const THAI_TITLE = 'แบบฝึกหัดเขียนอักษรไทย'
+const BLOCK_YIELD_INTERVAL = 4
 
 const PDF_FONT_FAMILIES: Record<string, PdfFontFamily> = {
   traditional: {
@@ -123,6 +131,23 @@ export function getGhostTextColor(index: number, total: number): RgbColor {
   return GHOST_BASE_COLOR.map((channel) =>
     Math.round(255 - (255 - channel) * opacity)
   ) as RgbColor
+}
+
+function emitProgress(args: DownloadPracticePdfArgs, state: PdfExportProgress): void {
+  args.onProgress?.(state)
+}
+
+async function yieldToBrowser(): Promise<void> {
+  if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+    await new Promise<void>((resolve) => {
+      window.requestAnimationFrame(() => resolve())
+    })
+    return
+  }
+
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 0)
+  })
 }
 
 function getPdfBlocks(args: DownloadPracticePdfArgs): PdfCharacterBlock[] {
@@ -363,7 +388,7 @@ function drawPracticeGrid(
   }
 }
 
-export function buildPracticePdf(doc: PdfDocLike, args: DownloadPracticePdfArgs): void {
+export async function buildPracticePdf(doc: PdfDocLike, args: DownloadPracticePdfArgs): Promise<void> {
   const layout = getPdfLayout(doc, args.config)
   const fontFamily = getPdfFontFamily(args.config.font)
   const fontLabel = args.config.font.charAt(0).toUpperCase() + args.config.font.slice(1)
@@ -386,7 +411,7 @@ export function buildPracticePdf(doc: PdfDocLike, args: DownloadPracticePdfArgs)
     return
   }
 
-  for (const block of blocks) {
+  for (const [index, block] of blocks.entries()) {
     const blockHeight = getBlockHeight(args.config, layout)
 
     if (currentY + blockHeight > layout.pageHeight - layout.bottomMargin) {
@@ -405,6 +430,16 @@ export function buildPracticePdf(doc: PdfDocLike, args: DownloadPracticePdfArgs)
       fontFamily
     )
     currentY += blockHeight
+
+    emitProgress(args, {
+      phase: 'generating',
+      completed: index + 1,
+      total: blocks.length,
+    })
+
+    if ((index + 1) % BLOCK_YIELD_INTERVAL === 0 && index < blocks.length - 1) {
+      await yieldToBrowser()
+    }
   }
 }
 
@@ -457,6 +492,20 @@ async function registerPdfFonts(doc: PdfDocLike): Promise<void> {
   }
 }
 
+function triggerPdfDownload(blob: Blob, filename: string): void {
+  const objectUrl = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = objectUrl
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+
+  window.setTimeout(() => {
+    URL.revokeObjectURL(objectUrl)
+  }, 0)
+}
+
 export async function downloadPracticePdf(args: DownloadPracticePdfArgs): Promise<void> {
   const doc = new jsPDF({
     format: 'a4',
@@ -464,7 +513,13 @@ export async function downloadPracticePdf(args: DownloadPracticePdfArgs): Promis
     unit: 'pt',
   })
 
+  emitProgress(args, { phase: 'preparing' })
   await registerPdfFonts(doc as unknown as PdfDocLike)
-  buildPracticePdf(doc as unknown as PdfDocLike, args)
-  doc.save(PDF_FILENAME)
+  await yieldToBrowser()
+  await buildPracticePdf(doc as unknown as PdfDocLike, args)
+
+  emitProgress(args, { phase: 'downloading' })
+  await yieldToBrowser()
+  const blob = (doc as unknown as PdfDocLike).output('blob')
+  triggerPdfDownload(blob, PDF_FILENAME)
 }
