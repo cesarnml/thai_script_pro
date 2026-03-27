@@ -10,6 +10,20 @@ This project uses a small testing pyramid with each layer owning a different kin
 - **App/integration**: `src/App.test.tsx` covers a few cross-component workflows such as presets, config clamping, and PDF export states.
 - **Browser smoke**: Playwright covers end-to-end confidence for preview updates, option changes, downloads, and responsive sanity checks.
 
+## Local Playwright setup
+
+Run this once per machine or whenever Playwright asks for browser binaries:
+
+```bash
+pnpm test:e2e:install
+```
+
+Then run the smoke suite with:
+
+```bash
+pnpm test:e2e
+```
+
 ## What not to lock down in RTL
 
 - Tailwind utility classes unless they are the product requirement.

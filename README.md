@@ -21,7 +21,16 @@ pnpm build     # production build
 pnpm preview   # preview production build
 pnpm test      # run Vitest in watch mode
 pnpm test:run  # run Vitest once
+pnpm test:e2e:install  # install the local Chromium runtime for Playwright
 pnpm test:e2e  # run Playwright smoke tests
+```
+
+Playwright local setup:
+
+```bash
+pnpm install
+pnpm test:e2e:install
+pnpm test:e2e
 ```
 
 ## Contributor conventions
