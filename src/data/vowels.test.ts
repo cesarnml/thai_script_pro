@@ -30,14 +30,10 @@ describe('THAI_VOWELS', () => {
 
   it('defines vowel presets with valid memberships', () => {
     const vowelIds = new Set(THAI_VOWELS.map((vowel) => vowel.id))
+    const shortPreset = THAI_VOWEL_PRESETS.find((preset) => preset.id === 'SHORT')
+    const longPreset = THAI_VOWEL_PRESETS.find((preset) => preset.id === 'LONG')
 
-    expect(THAI_VOWEL_PRESETS.map((preset) => preset.id)).toEqual([
-      'SHORT',
-      'LONG',
-      'MONOPHTHONGS',
-      'DIPHTHONGS',
-      'FORM_CHANGING',
-    ])
+    expect(THAI_VOWEL_PRESETS.map((preset) => preset.id)).toEqual(['SHORT', 'LONG'])
 
     for (const preset of THAI_VOWEL_PRESETS) {
       expect(preset.shortLabel.length).toBeGreaterThan(0)
@@ -45,6 +41,17 @@ describe('THAI_VOWELS', () => {
       expect(preset.vowelIds.length).toBeGreaterThan(0)
       preset.vowelIds.forEach((id) => expect(vowelIds.has(id)).toBe(true))
     }
+
+    if (!shortPreset || !longPreset) throw new Error('Expected short and long vowel presets to exist')
+
+    expect(shortPreset.vowelIds).toContain('ฤ')
+    expect(shortPreset.vowelIds).toContain('ฦ')
+
+    const shortSet = new Set(shortPreset.vowelIds)
+    const longSet = new Set(longPreset.vowelIds)
+
+    expect([...shortSet].filter((id) => longSet.has(id))).toEqual([])
+    expect(new Set([...shortPreset.vowelIds, ...longPreset.vowelIds])).toEqual(vowelIds)
   })
 
   it('formats vowels with a placeholder อ', () => {

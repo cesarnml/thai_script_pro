@@ -4,7 +4,7 @@ export interface ThaiVowel {
 }
 
 export interface ThaiVowelPreset {
-  id: 'SHORT' | 'LONG' | 'MONOPHTHONGS' | 'DIPHTHONGS' | 'FORM_CHANGING'
+  id: 'SHORT' | 'LONG'
   shortLabel: string
   fullLabel: string
   vowelIds: string[]
@@ -106,31 +106,13 @@ export const THAI_VOWEL_PRESETS: ThaiVowelPreset[] = [
     id: 'SHORT',
     shortLabel: 'Short Vowels',
     fullLabel: 'Short-duration vowel forms',
-    vowelIds: ['ะ', 'ั', 'ิ', 'ึ', 'ุ', 'เาะ', 'ัวะ', 'ัะ', 'เียะ', 'ือะ'],
+    vowelIds: ['ะ', 'ั', 'ิ', 'ึ', 'ุ', 'ฤ', 'ฦ', 'เาะ', 'ัวะ', 'ัะ', 'เียะ', 'ือะ'],
   },
   {
     id: 'LONG',
     shortLabel: 'Long Vowels',
     fullLabel: 'Long-duration vowel forms',
     vowelIds: ['า', 'ำ', 'ี', 'ื', 'ู', 'เ', 'แ', 'โ', 'ใ', 'ไ', 'ฤๅ', 'ฦๅ', 'เีย', 'ือ', 'ัว', 'ียว'],
-  },
-  {
-    id: 'MONOPHTHONGS',
-    shortLabel: 'Monophthongs',
-    fullLabel: 'Simple vowel sounds with one mouth position',
-    vowelIds: ['ะ', 'ั', 'า', 'ำ', 'ิ', 'ี', 'ึ', 'ื', 'ุ', 'ู', 'เ', 'แ', 'โ', 'ใ', 'ไ', 'ฤ', 'ฤๅ', 'ฦ', 'ฦๅ'],
-  },
-  {
-    id: 'DIPHTHONGS',
-    shortLabel: 'Diphthongs',
-    fullLabel: 'Compound vowel sounds',
-    vowelIds: ['เีย', 'ือ', 'ัว', 'ัวะ', 'เียะ', 'ือะ', 'ียว'],
-  },
-  {
-    id: 'FORM_CHANGING',
-    shortLabel: 'Form-Changing',
-    fullLabel: 'Vowels that commonly shift shape in closed syllables',
-    vowelIds: ['ะ', 'ั', 'ำ', 'เาะ', 'ัวะ', 'ัะ', 'เียะ', 'ือะ'],
   },
 ]
 

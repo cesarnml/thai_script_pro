@@ -173,30 +173,28 @@ describe('useContentSelection', () => {
     expect(result.current.activeVowelPresetLabel).toBe('Presets')
   })
 
-  it('applyVowelPreset merges overlapping presets and removes only the toggled group', () => {
+  it('applyVowelPreset merges short and long presets and removes only the toggled group', () => {
     const { result } = renderHook(() => useContentSelection())
     const short = getVowelPresetById('SHORT')
-    const formChanging = getVowelPresetById('FORM_CHANGING')
-    if (!short || !formChanging) throw new Error('Expected vowel presets to exist')
+    const long = getVowelPresetById('LONG')
+    if (!short || !long) throw new Error('Expected vowel presets to exist')
 
     act(() => {
       result.current.applyVowelPreset('SHORT')
-      result.current.applyVowelPreset('FORM_CHANGING')
+      result.current.applyVowelPreset('LONG')
     })
 
     expect(result.current.activeVowelPresetLabel).toBe('Custom')
     expect(new Set(result.current.selectedVowelIds)).toEqual(
-      new Set([...short.vowelIds, ...formChanging.vowelIds])
+      new Set([...short.vowelIds, ...long.vowelIds])
     )
 
     act(() => {
-      result.current.applyVowelPreset('FORM_CHANGING')
+      result.current.applyVowelPreset('LONG')
     })
 
-    expect(new Set(result.current.selectedVowelIds)).toEqual(
-      new Set(short.vowelIds.filter((id) => !formChanging.vowelIds.includes(id)))
-    )
-    expect(result.current.activeVowelPresetLabel).toBe('Custom')
+    expect(new Set(result.current.selectedVowelIds)).toEqual(new Set(short.vowelIds))
+    expect(result.current.activeVowelPresetLabel).toBe('Short Vowels')
   })
 
   it('applyVowelPreset removes a fully selected preset from a custom selection', () => {

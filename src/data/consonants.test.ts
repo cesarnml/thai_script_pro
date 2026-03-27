@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { THAI_CONSONANTS, THAI_CONSONANT_PRESETS } from './consonants'
+import {
+  CONSONANT_GROUP_COLOR_CLASSES,
+  THAI_CONSONANTS,
+  THAI_CONSONANT_PRESETS,
+  getConsonantPresetByConsonantId,
+} from './consonants'
 
 describe('THAI_CONSONANTS', () => {
   it('has exactly 44 consonants', () => {
@@ -34,8 +39,17 @@ describe('THAI_CONSONANTS', () => {
     for (const preset of THAI_CONSONANT_PRESETS) {
       expect(preset.shortLabel.length).toBeGreaterThan(0)
       expect(preset.fullLabel.length).toBeGreaterThan(0)
+      expect(preset.colorKey in CONSONANT_GROUP_COLOR_CLASSES).toBe(true)
       expect(preset.consonantIds.length).toBeGreaterThan(0)
       preset.consonantIds.forEach((id) => expect(consonantIds.has(id)).toBe(true))
+    }
+  })
+
+  it('maps every consonant to exactly one color-backed preset', () => {
+    for (const consonant of THAI_CONSONANTS) {
+      const preset = getConsonantPresetByConsonantId(consonant.id)
+      expect(preset).toBeDefined()
+      expect(preset?.colorKey in CONSONANT_GROUP_COLOR_CLASSES).toBe(true)
     }
   })
 })

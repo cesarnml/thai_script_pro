@@ -2,7 +2,12 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ContentSelection } from './ContentSelection'
-import { THAI_CONSONANTS, getConsonantPresetById } from '../data/consonants'
+import {
+  CONSONANT_GROUP_COLOR_CLASSES,
+  THAI_CONSONANTS,
+  getConsonantPresetByConsonantId,
+  getConsonantPresetById,
+} from '../data/consonants'
 import { THAI_VOWELS, formatVowelWithPlaceholder, getVowelPresetById } from '../data/vowels'
 
 describe('ContentSelection', () => {
@@ -86,6 +91,10 @@ describe('ContentSelection', () => {
       'title',
       'High Class Consonants'
     )
+    expect(screen.getByRole('option', { name: /Low Class - Group 1/i })).toHaveClass(
+      'border',
+      'border-transparent'
+    )
   })
 
   it('selecting LCG1 marks the expected consonants selected', async () => {
@@ -111,6 +120,31 @@ describe('ContentSelection', () => {
         'true'
       )
     })
+  })
+
+  it('keeps Presets and Custom triggers neutral but tints exact preset matches', async () => {
+    const user = userEvent.setup()
+    render(<ContentSelection />)
+
+    const trigger = screen.getByRole('button', { name: /consonant presets/i })
+    expect(trigger).toHaveClass('border-gray-200', 'bg-white', 'text-gray-700')
+
+    await user.click(trigger)
+    await user.click(screen.getByRole('option', { name: /Low Class - Group 1/i }))
+
+    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveClass(
+      'border-teal-200',
+      'bg-teal-50',
+      'text-teal-800'
+    )
+
+    await user.click(screen.getAllByRole('button', { name: /^ก/ })[0])
+    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveTextContent('Custom')
+    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveClass(
+      'border-gray-200',
+      'bg-white',
+      'text-gray-700'
+    )
   })
 
   it('clicking a checked preset row deselects that group', async () => {
@@ -196,6 +230,39 @@ describe('ContentSelection', () => {
     expect(screen.getAllByRole('button', { name: /^ก/ })[0]).toHaveAttribute('aria-pressed', 'true')
   })
 
+  it('renders consonant tiles with group colors even when unselected', () => {
+    render(<ContentSelection />)
+
+    const middleClassConsonant = THAI_CONSONANTS.find((consonant) => consonant.id === 'ก')
+    if (!middleClassConsonant) throw new Error('Expected ก consonant to exist')
+
+    const preset = getConsonantPresetByConsonantId(middleClassConsonant.id)
+    if (!preset) throw new Error('Expected consonant preset to exist')
+
+    const tile = screen.getAllByRole('button', { name: /^ก/ })[0]
+    const colorClasses = CONSONANT_GROUP_COLOR_CLASSES[preset.colorKey]
+
+    expect(tile).toHaveClass(
+      ...colorClasses.tileIdle.split(' ').filter(Boolean)
+    )
+  })
+
+  it('renders selected consonant tiles with stronger group colors', async () => {
+    const user = userEvent.setup()
+    render(<ContentSelection />)
+
+    const tile = screen.getAllByRole('button', { name: /^ก/ })[0]
+    const preset = getConsonantPresetByConsonantId('ก')
+    if (!preset) throw new Error('Expected consonant preset to exist')
+
+    await user.click(tile)
+
+    const colorClasses = CONSONANT_GROUP_COLOR_CLASSES[preset.colorKey]
+    expect(tile).toHaveClass(
+      ...colorClasses.tileActive.split(' ').filter(Boolean)
+    )
+  })
+
   it('renders Vowels section and summary shows vowels count', async () => {
     const user = userEvent.setup()
     render(<ContentSelection />)
@@ -224,18 +291,9 @@ describe('ContentSelection', () => {
       'title',
       'Long-duration vowel forms'
     )
-    expect(screen.getByRole('option', { name: /^Monophthongs/i })).toHaveAttribute(
-      'title',
-      'Simple vowel sounds with one mouth position'
-    )
-    expect(screen.getByRole('option', { name: /^Diphthongs/i })).toHaveAttribute(
-      'title',
-      'Compound vowel sounds'
-    )
-    expect(screen.getByRole('option', { name: /^Form-Changing/i })).toHaveAttribute(
-      'title',
-      'Vowels that commonly shift shape in closed syllables'
-    )
+    expect(screen.queryByRole('option', { name: /^Monophthongs/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /^Diphthongs/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /^Form-Changing/i })).not.toBeInTheDocument()
   })
 
   it('selecting a vowel preset marks the expected vowels selected', async () => {
@@ -261,23 +319,23 @@ describe('ContentSelection', () => {
     })
   })
 
-  it('selecting overlapping vowel presets yields Custom', async () => {
+  it('selecting short then long vowel presets yields Custom', async () => {
     const user = userEvent.setup()
     const short = getVowelPresetById('SHORT')
-    const formChanging = getVowelPresetById('FORM_CHANGING')
-    if (!short || !formChanging) throw new Error('Expected vowel presets to exist')
+    const long = getVowelPresetById('LONG')
+    if (!short || !long) throw new Error('Expected vowel presets to exist')
 
     render(<ContentSelection />)
 
     await user.click(screen.getByRole('button', { name: /vowel presets/i }))
     await user.click(screen.getByRole('option', { name: /^Short Vowels/i }))
     await user.click(screen.getByRole('button', { name: /vowel presets/i }))
-    await user.click(screen.getByRole('option', { name: /^Form-Changing/i }))
+    await user.click(screen.getByRole('option', { name: /^Long Vowels/i }))
 
     expect(screen.getByRole('button', { name: /vowel presets/i })).toHaveTextContent('Custom')
     expect(
       screen.getByText(
-        new RegExp(`${new Set([...short.vowelIds, ...formChanging.vowelIds]).size} of ${THAI_VOWELS.length} selected`, 'i')
+        new RegExp(`${new Set([...short.vowelIds, ...long.vowelIds]).size} of ${THAI_VOWELS.length} selected`, 'i')
       )
     ).toBeInTheDocument()
   })

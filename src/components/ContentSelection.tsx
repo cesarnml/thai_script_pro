@@ -1,8 +1,11 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useContentSelection } from '../hooks/useContentSelection'
 import {
+  CONSONANT_GROUP_COLOR_CLASSES,
   THAI_CONSONANTS,
   THAI_CONSONANT_PRESETS,
+  getConsonantExactMatchPreset,
+  getConsonantPresetByConsonantId,
   getConsonantPresetTriggerLabel,
   type ThaiConsonantPreset,
 } from '../data/consonants'
@@ -52,6 +55,7 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
   const consonantSet = new Set(selectedConsonantIds)
   const vowelSet = new Set(selectedVowelIds)
   const consonantPresetTriggerLabel = getConsonantPresetTriggerLabel(selectedConsonantIds)
+  const exactConsonantPreset = getConsonantExactMatchPreset(selectedConsonantIds)
   const vowelPresetTriggerLabel = getVowelPresetTriggerLabel(selectedVowelIds)
 
   useEffect(() => {
@@ -98,6 +102,10 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
     }
   }, [isVowelPresetMenuOpen])
 
+  const consonantTriggerClasses = exactConsonantPreset
+    ? CONSONANT_GROUP_COLOR_CLASSES[exactConsonantPreset.colorKey].trigger
+    : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+
   return (
     <section className="space-y-6" aria-label="Content selection">
       <p className="sr-only" role="status">
@@ -121,7 +129,7 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
                 aria-expanded={isConsonantPresetMenuOpen}
                 aria-controls={consonantPresetListboxId}
                 onClick={() => setIsConsonantPresetMenuOpen((open) => !open)}
-                className="inline-flex min-w-32 items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+                className={`inline-flex min-w-32 items-center justify-between gap-3 rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm transition-colors ${consonantTriggerClasses}`}
               >
                 <span title={consonantPresetTriggerLabel === 'Custom' ? 'Custom selection' : consonantPresetTriggerLabel}>
                   {consonantPresetTriggerLabel}
@@ -141,6 +149,7 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
                 >
                   {THAI_CONSONANT_PRESETS.map((preset) => {
                     const isApplied = preset.consonantIds.every((id) => consonantSet.has(id))
+                    const colorClasses = CONSONANT_GROUP_COLOR_CLASSES[preset.colorKey]
 
                     return (
                       <button
@@ -154,16 +163,16 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
                           setIsConsonantPresetMenuOpen(false)
                         }}
                         className={`flex w-full items-start justify-between rounded-lg px-3 py-2 text-left transition-colors ${
-                          isApplied ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50'
+                          isApplied ? colorClasses.rowActive : colorClasses.rowIdle
                         }`}
                       >
                         <span>
                           <span className="block text-sm font-semibold">{preset.shortLabel}</span>
-                          <span className="block text-xs text-gray-400">{preset.fullLabel}</span>
+                          <span className={`block text-xs ${colorClasses.rowMeta}`}>{preset.fullLabel}</span>
                         </span>
                         <span
                           aria-hidden="true"
-                          className={`mt-0.5 text-xs ${isApplied ? 'text-indigo-500' : 'text-gray-300'}`}
+                          className={`mt-0.5 text-xs ${isApplied ? colorClasses.check : 'text-gray-300'}`}
                         >
                           {isApplied ? '✓' : ''}
                         </span>
@@ -197,33 +206,46 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
           className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(55px,1fr))] md:[grid-template-columns:repeat(10,minmax(0,1fr))]"
           data-consonant-grid="true"
         >
-          {THAI_CONSONANTS.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => toggleConsonant(c.id)}
-              aria-pressed={consonantSet.has(c.id)}
-              style={fontStyle}
-              className={`flex flex-col items-center py-2.5 px-1 rounded-xl border transition-colors ${
-                consonantSet.has(c.id)
-                  ? 'bg-indigo-50 border-indigo-300 ring-1 ring-indigo-200'
-                  : 'bg-white border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              <span className="text-2xl leading-tight" translate="no" lang="th">
-                {c.char}
-              </span>
-              {c.name && (
-                <span
-                  className="text-[10px] text-gray-400 mt-0.5 truncate max-w-full"
-                  translate="no"
-                  lang="th"
-                >
-                  {c.name}
+          {THAI_CONSONANTS.map((c) => {
+            const preset = getConsonantPresetByConsonantId(c.id)
+            const colorClasses = preset
+              ? CONSONANT_GROUP_COLOR_CLASSES[preset.colorKey]
+              : undefined
+
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => toggleConsonant(c.id)}
+                aria-pressed={consonantSet.has(c.id)}
+                style={fontStyle}
+                className={`flex flex-col items-center py-2.5 px-1 rounded-xl border transition-colors ${
+                  colorClasses
+                    ? consonantSet.has(c.id)
+                      ? colorClasses.tileActive
+                      : colorClasses.tileIdle
+                    : consonantSet.has(c.id)
+                      ? 'bg-indigo-50 border-indigo-300 ring-1 ring-indigo-200'
+                      : 'bg-white border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                <span className="text-2xl leading-tight" translate="no" lang="th">
+                  {c.char}
                 </span>
-              )}
-            </button>
-          ))}
+                {c.name && (
+                  <span
+                    className={`text-[10px] mt-0.5 truncate max-w-full ${
+                      colorClasses ? colorClasses.tileMeta : 'text-gray-400'
+                    }`}
+                    translate="no"
+                    lang="th"
+                  >
+                    {c.name}
+                  </span>
+                )}
+              </button>
+            )
+          })}
         </div>
       </div>
 
