@@ -37,12 +37,22 @@ For the implemented product and current constraints, start with [docs/CURRENT_ST
 ## Commands
 
 ```bash
+pnpm install   # install dependencies
+pnpm dev       # start dev server (http://localhost:5173)
+pnpm build     # production build
+pnpm preview   # preview production build
+pnpm test      # run Vitest in watch mode
+pnpm test:run  # run Vitest once
+pnpm test:e2e:install  # install the local Chromium runtime for Playwright
+pnpm test:e2e  # run Playwright smoke tests
+```
+
+Playwright local setup:
+
+```bash
 pnpm install
-pnpm dev
-pnpm build
-pnpm preview
-pnpm test
-pnpm test:run
+pnpm test:e2e:install
+pnpm test:e2e
 ```
 
 The dev server runs at [http://localhost:5173](http://localhost:5173) by default.

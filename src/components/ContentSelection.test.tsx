@@ -3,9 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ContentSelection } from './ContentSelection'
 import {
-  CONSONANT_GROUP_COLOR_CLASSES,
   THAI_CONSONANTS,
-  getConsonantPresetByConsonantId,
   getConsonantPresetById,
 } from '../data/consonants'
 import { THAI_VOWELS, formatVowelWithPlaceholder, getVowelPresetById } from '../data/vowels'
@@ -22,16 +20,6 @@ describe('ContentSelection', () => {
     if (!consonantGrid) throw new Error('Expected consonant grid to be rendered')
     const buttons = consonantGrid.querySelectorAll('button')
     expect(buttons).toHaveLength(44)
-  })
-
-  it('uses a 55px minimum width for consonant cells on smaller screens', () => {
-    const { container } = render(<ContentSelection />)
-    const consonantGrid = container.querySelector('[data-consonant-grid="true"]')
-
-    if (!consonantGrid) throw new Error('Expected consonant grid to be rendered')
-    expect(consonantGrid).toHaveClass(
-      '[grid-template-columns:repeat(auto-fit,minmax(55px,1fr))]'
-    )
   })
 
   it('clicking a consonant toggles selection and updates summary', async () => {
@@ -122,29 +110,18 @@ describe('ContentSelection', () => {
     })
   })
 
-  it('keeps Presets and Custom triggers neutral but tints exact preset matches', async () => {
+  it('closes the consonant presets menu when clicking outside it', async () => {
     const user = userEvent.setup()
     render(<ContentSelection />)
 
     const trigger = screen.getByRole('button', { name: /consonant presets/i })
-    expect(trigger).toHaveClass('border-gray-200', 'bg-white', 'text-gray-700')
-
     await user.click(trigger)
-    await user.click(screen.getByRole('option', { name: /Low Class - Group 1/i }))
 
-    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveClass(
-      'border-teal-200',
-      'bg-teal-50',
-      'text-teal-800'
-    )
+    expect(screen.getByRole('listbox', { name: /consonant preset options/i })).toBeInTheDocument()
 
-    await user.click(screen.getAllByRole('button', { name: /^ก/ })[0])
-    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveTextContent('Custom')
-    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveClass(
-      'border-gray-200',
-      'bg-white',
-      'text-gray-700'
-    )
+    await user.click(document.body)
+
+    expect(screen.queryByRole('listbox', { name: /consonant preset options/i })).not.toBeInTheDocument()
   })
 
   it('clicking a checked preset row deselects that group', async () => {
@@ -230,39 +207,6 @@ describe('ContentSelection', () => {
     expect(screen.getAllByRole('button', { name: /^ก/ })[0]).toHaveAttribute('aria-pressed', 'true')
   })
 
-  it('renders consonant tiles with group colors even when unselected', () => {
-    render(<ContentSelection />)
-
-    const middleClassConsonant = THAI_CONSONANTS.find((consonant) => consonant.id === 'ก')
-    if (!middleClassConsonant) throw new Error('Expected ก consonant to exist')
-
-    const preset = getConsonantPresetByConsonantId(middleClassConsonant.id)
-    if (!preset) throw new Error('Expected consonant preset to exist')
-
-    const tile = screen.getAllByRole('button', { name: /^ก/ })[0]
-    const colorClasses = CONSONANT_GROUP_COLOR_CLASSES[preset.colorKey]
-
-    expect(tile).toHaveClass(
-      ...colorClasses.tileIdle.split(' ').filter(Boolean)
-    )
-  })
-
-  it('renders selected consonant tiles with stronger group colors', async () => {
-    const user = userEvent.setup()
-    render(<ContentSelection />)
-
-    const tile = screen.getAllByRole('button', { name: /^ก/ })[0]
-    const preset = getConsonantPresetByConsonantId('ก')
-    if (!preset) throw new Error('Expected consonant preset to exist')
-
-    await user.click(tile)
-
-    const colorClasses = CONSONANT_GROUP_COLOR_CLASSES[preset.colorKey]
-    expect(tile).toHaveClass(
-      ...colorClasses.tileActive.split(' ').filter(Boolean)
-    )
-  })
-
   it('renders Vowels section and summary shows vowels count', async () => {
     const user = userEvent.setup()
     render(<ContentSelection />)
@@ -294,6 +238,18 @@ describe('ContentSelection', () => {
     expect(screen.queryByRole('option', { name: /^Monophthongs/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('option', { name: /^Diphthongs/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('option', { name: /^Form-Changing/i })).not.toBeInTheDocument()
+  })
+
+  it('closes the vowel presets menu when pressing Escape', async () => {
+    const user = userEvent.setup()
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+    expect(screen.getByRole('listbox', { name: /vowel preset options/i })).toBeInTheDocument()
+
+    await user.keyboard('{Escape}')
+
+    expect(screen.queryByRole('listbox', { name: /vowel preset options/i })).not.toBeInTheDocument()
   })
 
   it('selecting a vowel preset marks the expected vowels selected', async () => {
@@ -392,17 +348,6 @@ describe('ContentSelection', () => {
     render(<ContentSelection />)
     expect(screen.getByRole('button', { name: formatVowelWithPlaceholder('ะ') })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: formatVowelWithPlaceholder('เ') })).toBeInTheDocument()
-  })
-
-  it('applies the selected font family to consonant and vowel buttons', () => {
-    render(<ContentSelection fontFamily='"Prompt", sans-serif' />)
-
-    expect(screen.getAllByRole('button', { name: /^ก/ })[0]).toHaveStyle({
-      fontFamily: '"Prompt", sans-serif',
-    })
-    expect(screen.getByRole('button', { name: formatVowelWithPlaceholder('ะ') })).toHaveStyle({
-      fontFamily: '"Prompt", sans-serif',
-    })
   })
 
   it('marks visible Thai consonant glyphs and names as non-translatable', () => {

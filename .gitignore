@@ -31,6 +31,8 @@ Thumbs.db
 coverage
 .nyc_output
 *.lcov
+playwright-report
+test-results
 *.tsbuildinfo
 
 # Vite
