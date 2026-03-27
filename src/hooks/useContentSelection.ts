@@ -1,5 +1,10 @@
 import { useState, useCallback } from 'react'
-import { THAI_CONSONANTS } from '../data/consonants'
+import {
+  THAI_CONSONANTS,
+  getConsonantPresetById,
+  getConsonantPresetTriggerLabel,
+  type ThaiConsonantPreset,
+} from '../data/consonants'
 import { THAI_VOWELS } from '../data/vowels'
 
 export function useContentSelection() {
@@ -32,6 +37,24 @@ export function useContentSelection() {
     setSelectedConsonantIds(new Set())
   }, [])
 
+  const applyConsonantPreset = useCallback((presetId: ThaiConsonantPreset['id']) => {
+    const preset = getConsonantPresetById(presetId)
+    if (!preset) return
+
+    setSelectedConsonantIds((prev) => {
+      const next = new Set(prev)
+
+      const isApplied = preset.consonantIds.every((id) => next.has(id))
+
+      preset.consonantIds.forEach((id) => {
+        if (isApplied) next.delete(id)
+        else next.add(id)
+      })
+
+      return next
+    })
+  }, [])
+
   const selectAllVowels = useCallback(() => {
     setSelectedVowelIds(new Set(THAI_VOWELS.map((v) => v.id)))
   }, [])
@@ -43,8 +66,10 @@ export function useContentSelection() {
   return {
     selectedConsonantIds: Array.from(selectedConsonantIds),
     selectedVowelIds: Array.from(selectedVowelIds),
+    activeConsonantPresetLabel: getConsonantPresetTriggerLabel(Array.from(selectedConsonantIds)),
     toggleConsonant,
     toggleVowel,
+    applyConsonantPreset,
     selectAllConsonants,
     clearConsonants,
     selectAllVowels,

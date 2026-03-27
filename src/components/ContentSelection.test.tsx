@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ContentSelection } from './ContentSelection'
-import { THAI_CONSONANTS } from '../data/consonants'
+import { THAI_CONSONANTS, getConsonantPresetById } from '../data/consonants'
 import { THAI_VOWELS, formatVowelWithPlaceholder } from '../data/vowels'
 
 describe('ContentSelection', () => {
@@ -56,6 +56,144 @@ describe('ContentSelection', () => {
     await user.click(screen.getByRole('button', { name: /select all.*consonant/i }))
     await user.click(screen.getByRole('button', { name: /clear.*consonant/i }))
     expect(screen.getByText(/0 consonants?/i)).toBeInTheDocument()
+  })
+
+  it('renders a presets dropdown for consonants', () => {
+    render(<ContentSelection />)
+    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveTextContent('Presets')
+  })
+
+  it('shows all preset options with their full labels when opened', async () => {
+    const user = userEvent.setup()
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+
+    expect(screen.getByRole('listbox', { name: /consonant preset options/i })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /Low Class - Group 1/i })).toHaveAttribute(
+      'title',
+      'Low Class Consonants - Unpaired'
+    )
+    expect(screen.getByRole('option', { name: /Low Class - Group 2/i })).toHaveAttribute(
+      'title',
+      'Low Class Consonants - Paired'
+    )
+    expect(screen.getByRole('option', { name: /^Middle Class/i })).toHaveAttribute(
+      'title',
+      'Middle Class Consonants'
+    )
+    expect(screen.getByRole('option', { name: /^High Class/i })).toHaveAttribute(
+      'title',
+      'High Class Consonants'
+    )
+  })
+
+  it('selecting LCG1 marks the expected consonants selected', async () => {
+    const user = userEvent.setup()
+    const lcg1 = getConsonantPresetById('LCG1')
+    if (!lcg1) throw new Error('Expected LCG1 preset to exist')
+
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+    await user.click(screen.getByRole('option', { name: /Low Class - Group 1/i }))
+
+    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveTextContent(
+      'Low Class - Group 1'
+    )
+    expect(
+      screen.getByText(new RegExp(`${lcg1.consonantIds.length} of ${THAI_CONSONANTS.length} selected`, 'i'))
+    ).toBeInTheDocument()
+
+    lcg1.consonantIds.forEach((id) => {
+      expect(screen.getAllByRole('button', { name: new RegExp(`^${id}`) })[0]).toHaveAttribute(
+        'aria-pressed',
+        'true'
+      )
+    })
+  })
+
+  it('clicking a checked preset row deselects that group', async () => {
+    const user = userEvent.setup()
+    const lcg1 = getConsonantPresetById('LCG1')
+    if (!lcg1) throw new Error('Expected LCG1 preset to exist')
+
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+    await user.click(screen.getByRole('option', { name: /Low Class - Group 1/i }))
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+    await user.click(screen.getByRole('option', { name: /Low Class - Group 1/i }))
+
+    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveTextContent('Presets')
+    expect(screen.getByText(new RegExp(`0 of ${THAI_CONSONANTS.length} selected`, 'i'))).toBeInTheDocument()
+
+    lcg1.consonantIds.forEach((id) => {
+      expect(screen.getAllByRole('button', { name: new RegExp(`^${id}`) })[0]).toHaveAttribute(
+        'aria-pressed',
+        'false'
+      )
+    })
+  })
+
+  it('selecting LCG1 then MC merges both preset groups', async () => {
+    const user = userEvent.setup()
+    const lcg1 = getConsonantPresetById('LCG1')
+    const mc = getConsonantPresetById('MC')
+    if (!lcg1 || !mc) throw new Error('Expected presets to exist')
+
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+    await user.click(screen.getByRole('option', { name: /Low Class - Group 1/i }))
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Middle Class/i }))
+
+    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveTextContent('Custom')
+    expect(
+      screen.getByText(
+        new RegExp(`${lcg1.consonantIds.length + mc.consonantIds.length} of ${THAI_CONSONANTS.length} selected`, 'i')
+      )
+    ).toBeInTheDocument()
+  })
+
+  it('falls back to Custom after manually editing a preset-applied selection', async () => {
+    const user = userEvent.setup()
+    const lcg1 = getConsonantPresetById('LCG1')
+    if (!lcg1) throw new Error('Expected LCG1 preset to exist')
+
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+    await user.click(screen.getByRole('option', { name: /Low Class - Group 1/i }))
+    await user.click(screen.getAllByRole('button', { name: /^ก/ })[0])
+
+    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveTextContent('Custom')
+    expect(
+      screen.getByText(new RegExp(`${lcg1.consonantIds.length + 1} of ${THAI_CONSONANTS.length} selected`, 'i'))
+    ).toBeInTheDocument()
+  })
+
+  it('keeps a preset row checked in Custom state and lets the user toggle it off', async () => {
+    const user = userEvent.setup()
+    const lcg1 = getConsonantPresetById('LCG1')
+    if (!lcg1) throw new Error('Expected LCG1 preset to exist')
+
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+    await user.click(screen.getByRole('option', { name: /Low Class - Group 1/i }))
+    await user.click(screen.getAllByRole('button', { name: /^ก/ })[0])
+
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+    const presetOption = screen.getByRole('option', { name: /Low Class - Group 1/i })
+    expect(presetOption).toHaveAttribute('aria-selected', 'true')
+
+    await user.click(presetOption)
+
+    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveTextContent('Custom')
+    expect(screen.getByText(new RegExp(`1 of ${THAI_CONSONANTS.length} selected`, 'i'))).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /^ก/ })[0]).toHaveAttribute('aria-pressed', 'true')
   })
 
   it('renders Vowels section and summary shows vowels count', async () => {

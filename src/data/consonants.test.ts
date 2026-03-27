@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { THAI_CONSONANTS } from './consonants'
+import { THAI_CONSONANTS, THAI_CONSONANT_PRESETS } from './consonants'
 
 describe('THAI_CONSONANTS', () => {
   it('has exactly 44 consonants', () => {
@@ -24,5 +24,18 @@ describe('THAI_CONSONANTS', () => {
     const ids = THAI_CONSONANTS.map((c) => c.id)
     const set = new Set(ids)
     expect(set.size).toBe(ids.length)
+  })
+
+  it('defines the four consonant presets with valid memberships', () => {
+    const consonantIds = new Set(THAI_CONSONANTS.map((consonant) => consonant.id))
+
+    expect(THAI_CONSONANT_PRESETS.map((preset) => preset.id)).toEqual(['LCG1', 'LCG2', 'MC', 'HC'])
+
+    for (const preset of THAI_CONSONANT_PRESETS) {
+      expect(preset.shortLabel.length).toBeGreaterThan(0)
+      expect(preset.fullLabel.length).toBeGreaterThan(0)
+      expect(preset.consonantIds.length).toBeGreaterThan(0)
+      preset.consonantIds.forEach((id) => expect(consonantIds.has(id)).toBe(true))
+    }
   })
 })
