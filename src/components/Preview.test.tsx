@@ -242,7 +242,7 @@ describe('Preview', () => {
     )
 
     const worksheetTitle = Array.from(container.querySelectorAll('h3')).find(
-      (node) => node.textContent === 'แบบฝึกหัดเขียนอักษรไทย'
+      (node) => node.textContent === 'Thai Script Pro'
     )
     const consonantGlyph = Array.from(container.querySelectorAll('span')).find(
       (node) => node.textContent === THAI_CONSONANTS[0].char
@@ -255,7 +255,6 @@ describe('Preview', () => {
     )
 
     expect(worksheetTitle).toHaveAttribute('translate', 'no')
-    expect(worksheetTitle).toHaveAttribute('lang', 'th')
     expect(consonantGlyph).toHaveAttribute('translate', 'no')
     expect(consonantGlyph).toHaveAttribute('lang', 'th')
     expect(consonantName).toHaveAttribute('translate', 'no')

@@ -97,7 +97,7 @@ const SECONDARY_TEXT_COLOR: RgbColor = [99, 102, 107]
 const SUBTITLE_COLOR: RgbColor = [156, 163, 175]
 const GHOST_BASE_COLOR: RgbColor = [156, 163, 175]
 const PDF_FILENAME = 'thai-script-practice.pdf'
-const THAI_TITLE = 'แบบฝึกหัดเขียนอักษรไทย'
+const WORKSHEET_TITLE = 'Thai Script Pro'
 const BLOCK_YIELD_INTERVAL = 4
 
 const PDF_FONT_FAMILIES: Record<string, PdfFontFamily> = {
@@ -231,7 +231,7 @@ function drawDocumentHeader(
   doc.setTextColor(...PRIMARY_TEXT_COLOR)
   doc.setFont(fontFamily.semibold.fontName)
   doc.setFontSize(layout.titleFontSize)
-  doc.text(THAI_TITLE, layout.pageWidth / 2, layout.topY, { align: 'center' })
+  doc.text(WORKSHEET_TITLE, layout.pageWidth / 2, layout.topY, { align: 'center' })
 
   const subtitleY = layout.topY + 24
   doc.setFont(fontFamily.regular.fontName)

@@ -169,9 +169,8 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
           <h3
             className="text-center text-xl font-bold text-gray-900 mb-1"
             translate="no"
-            lang="th"
           >
-            แบบฝึกหัดเขียนอักษรไทย
+            Thai Script Pro
           </h3>
           <p className="text-center text-sm text-gray-400 mb-8">
             Thai {charType.charAt(0).toUpperCase() + charType.slice(1)} Writing
