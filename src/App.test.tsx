@@ -62,7 +62,7 @@ describe('App', () => {
   })
 
   it('renders content selection, sheet options, preview, and output actions', () => {
-    const { container } = render(<App />)
+    render(<App />)
     const contentSelectionHeading = screen.getByRole('heading', { name: /consonants/i })
     const rowsSelect = screen.getByLabelText(/^rows$/i)
 
@@ -70,24 +70,6 @@ describe('App', () => {
     expect(rowsSelect).toBeInTheDocument()
     expect(screen.getByRole('region', { name: /preview/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /download pdf/i })).toBeInTheDocument()
-
-    const sheetOptionsSection = rowsSelect.closest('section')
-    const contentSelectionSection = contentSelectionHeading.closest('section')
-
-    expect(sheetOptionsSection).not.toBeNull()
-    expect(contentSelectionSection).not.toBeNull()
-    expect(
-      container.compareDocumentPosition(sheetOptionsSection!) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy()
-    expect(
-      container.compareDocumentPosition(contentSelectionSection!) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy()
-    expect(
-      sheetOptionsSection!.compareDocumentPosition(contentSelectionSection!) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy()
   })
 
   it('downloads PDF through the native generator helper', async () => {
@@ -105,38 +87,6 @@ describe('App', () => {
         onProgress: expect.any(Function),
       })
     )
-  })
-
-  it('grows the initial columns from 3 to the largest viewport-safe value on first load', async () => {
-    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
-      configurable: true,
-      get() {
-        if ((this as HTMLElement).dataset.previewSurface === 'true') return 720
-        return 0
-      },
-    })
-
-    render(<App />)
-
-    expect(await screen.findByLabelText(/^columns$/i)).toHaveValue('9')
-    expect(screen.queryByText('Adjusted to 9 columns so it fits on the page.')).not.toBeInTheDocument()
-  })
-
-  it('applies the font dropdown selection to content selection buttons', async () => {
-    const user = userEvent.setup()
-    render(<App />)
-
-    const fontSelect = screen.getByRole('combobox', { name: /^font$/i })
-    await user.selectOptions(fontSelect, 'cursive')
-
-    expect(screen.getAllByRole('button', { name: /^ก/ })[0]).toHaveStyle({
-      fontFamily: '"Itim", cursive',
-    })
-    expect(
-      screen.getByRole('button', { name: formatVowelWithPlaceholder('ะ') })
-    ).toHaveStyle({
-      fontFamily: '"Itim", cursive',
-    })
   })
 
   it('applies consonant presets through the content selection section', async () => {

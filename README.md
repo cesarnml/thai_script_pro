@@ -2,14 +2,15 @@
 
 Web app for generating customizable Thai script practice sheets (consonants and vowels). Select content, set options, preview, and print or download as PDF.
 
-See [docs/PRD_01_MVP.md](docs/PRD_01_MVP.md) for the product spec and [docs/MVP_TASKS_TDD.md](docs/MVP_TASKS_TDD.md) for the TDD task breakdown. [docs/TDD_APPROACH.md](docs/TDD_APPROACH.md) explains the Red → Green → Refactor loop used in this project.
+See [docs/PRD_01_MVP.md](docs/PRD_01_MVP.md) for the product spec, [docs/MVP_TASKS_TDD.md](docs/MVP_TASKS_TDD.md) for the TDD task breakdown, [docs/TDD_APPROACH.md](docs/TDD_APPROACH.md) for the Red → Green → Refactor loop, and [docs/TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md) for the current test-level guidance.
 
 ## Stack
 
 - React 19 + TypeScript
 - Vite, PNPM
 - TailwindCSS
-- Vitest + React Testing Library (component/unit), Playwright (E2E, to be added)
+- Vitest + React Testing Library (unit/component/integration)
+- Playwright (browser smoke tests)
 
 ## Commands
 
@@ -20,6 +21,7 @@ pnpm build     # production build
 pnpm preview   # preview production build
 pnpm test      # run Vitest in watch mode
 pnpm test:run  # run Vitest once
+pnpm test:e2e  # run Playwright smoke tests
 ```
 
 ## Contributor conventions
