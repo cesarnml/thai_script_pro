@@ -122,6 +122,27 @@ export function getInitialColumnsForWidth(fontSize: string, availableWidthPx: nu
   return Math.max(minConfigured, computedMax)
 }
 
+export function normalizeSheetConfig(config: SheetConfig): SheetConfig {
+  const maxColumns = getMaxColumnsForFontSize(config.fontSize)
+  const columns = Math.min(config.columns, maxColumns)
+
+  return {
+    ...config,
+    columns,
+    ghostCopiesPerRow: Math.min(config.ghostCopiesPerRow, columns),
+  }
+}
+
+export function getSheetConfigClampNotice(
+  previousConfig: SheetConfig,
+  nextConfig: SheetConfig
+): string | null {
+  if (nextConfig.fontSize === previousConfig.fontSize) return null
+  if (nextConfig.columns === previousConfig.columns) return null
+
+  return `Adjusted to ${nextConfig.columns} columns so it fits on the page.`
+}
+
 const defaultFont = FONT_OPTIONS.find((f) => f.isDefault)!
 
 export const DEFAULT_SHEET_CONFIG: SheetConfig = {

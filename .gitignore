@@ -33,6 +33,7 @@ coverage
 *.lcov
 playwright-report
 test-results
+*.tsbuildinfo
 
 # Vite
 *.local

@@ -2,6 +2,11 @@ import type { SheetConfig } from '../data/sheetOptions'
 import { THAI_CONSONANTS } from '../data/consonants'
 import { THAI_VOWELS } from '../data/vowels'
 import { FONT_OPTIONS, FONT_FAMILY_MAP, FONT_SIZE_MAP } from '../data/sheetOptions'
+import {
+  buildWorksheetSubtitle,
+  EMPTY_WORKSHEET_MESSAGE,
+  WORKSHEET_TITLE,
+} from '../data/worksheetContent'
 import { VowelDisplay } from './VowelDisplay'
 
 interface PreviewProps {
@@ -145,19 +150,18 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
   const fontFamily = FONT_FAMILY_MAP[config.font] || '"Sarabun", sans-serif'
   const fontLabel = FONT_OPTIONS.find((f) => f.id === config.font)?.label || 'Traditional'
   const totalChars = consonants.length + vowels.length
-  const charType =
-    consonants.length > 0 && vowels.length > 0
-      ? 'characters'
-      : consonants.length > 0
-        ? 'consonants'
-        : 'vowels'
+  const subtitle = buildWorksheetSubtitle({
+    consonantCount: consonants.length,
+    vowelCount: vowels.length,
+    fontLabel,
+  })
 
   return (
     <section role="region" aria-label="Preview" className="min-h-[200px]">
       {totalChars === 0 ? (
         <div className="bg-white rounded-2xl p-12 text-center" data-preview-surface="true">
           <p className="text-gray-400 text-sm">
-            Select consonants or vowels to see preview.
+            {EMPTY_WORKSHEET_MESSAGE}
           </p>
         </div>
       ) : (
@@ -170,11 +174,10 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
             className="text-center text-xl font-bold text-gray-900 mb-1"
             translate="no"
           >
-            Thai Script Pro
+            {WORKSHEET_TITLE}
           </h3>
           <p className="text-center text-sm text-gray-400 mb-8">
-            Thai {charType.charAt(0).toUpperCase() + charType.slice(1)} Writing
-            Practice &middot; {totalChars} {charType} &middot; {fontLabel}
+            {subtitle}
           </p>
 
           <div
