@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { getConsonantPresetById } from './data/consonants'
-import { THAI_VOWELS, formatVowelWithPlaceholder, getVowelPresetById } from './data/vowels'
+import { THAI_VOWELS, getVowelPresetById } from './data/vowels'
 import { DEFAULT_SHEET_CONFIG } from './data/sheetOptions'
 
 const { downloadPracticePdfMock } = vi.hoisted(() => {
