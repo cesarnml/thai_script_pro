@@ -38,3 +38,6 @@ coverage
 # Optional
 .cache
 .turbo
+
+# Editor workspace settings (personal, not shared project config)
+.vscode/settings.json
