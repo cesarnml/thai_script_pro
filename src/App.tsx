@@ -9,20 +9,10 @@ import { usePdfExport } from './hooks/usePdfExport'
 import {
   DEFAULT_SHEET_CONFIG,
   FONT_FAMILY_MAP,
-  getMaxColumnsForFontSize,
+  getSheetConfigClampNotice,
+  normalizeSheetConfig,
 } from './data/sheetOptions'
 import type { SheetConfig } from './data/sheetOptions'
-
-function normalizeSheetConfig(config: SheetConfig): SheetConfig {
-  const maxColumns = getMaxColumnsForFontSize(config.fontSize)
-  const columns = Math.min(config.columns, maxColumns)
-
-  return {
-    ...config,
-    columns,
-    ghostCopiesPerRow: Math.min(config.ghostCopiesPerRow, columns),
-  }
-}
 
 function App() {
   const selection = useContentSelection()
@@ -81,13 +71,8 @@ function App() {
 
   const handleSheetConfigChange = (nextConfig: SheetConfig) => {
     const normalizedConfig = normalizeSheetConfig(nextConfig)
-
-    if (
-      nextConfig.fontSize !== sheetConfig.fontSize &&
-      normalizedConfig.columns !== sheetConfig.columns
-    ) {
-      setToastMessage(`Adjusted to ${normalizedConfig.columns} columns so it fits on the page.`)
-    }
+    const clampNotice = getSheetConfigClampNotice(sheetConfig, normalizedConfig)
+    if (clampNotice) setToastMessage(clampNotice)
 
     setSheetConfig(normalizedConfig)
   }
