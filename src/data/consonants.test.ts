@@ -49,7 +49,8 @@ describe('THAI_CONSONANTS', () => {
     for (const consonant of THAI_CONSONANTS) {
       const preset = getConsonantPresetByConsonantId(consonant.id)
       expect(preset).toBeDefined()
-      expect(preset?.colorKey in CONSONANT_GROUP_COLOR_CLASSES).toBe(true)
+      if (!preset) throw new Error(`Expected preset for consonant ${consonant.id}`)
+      expect(preset.colorKey in CONSONANT_GROUP_COLOR_CLASSES).toBe(true)
     }
   })
 })
