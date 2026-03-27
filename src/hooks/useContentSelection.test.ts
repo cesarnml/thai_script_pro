@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useContentSelection } from './useContentSelection'
 import { THAI_CONSONANTS, getConsonantPresetById } from '../data/consonants'
-import { THAI_VOWELS } from '../data/vowels'
+import { THAI_VOWELS, getVowelPresetById } from '../data/vowels'
 
 describe('useContentSelection', () => {
   it('starts with no consonants or vowels selected', () => {
@@ -146,6 +146,80 @@ describe('useContentSelection', () => {
     expect(result.current.selectedVowelIds).not.toContain(id)
   })
 
+  it('applyVowelPreset adds a preset to an empty selection', () => {
+    const { result } = renderHook(() => useContentSelection())
+    const preset = getVowelPresetById('SHORT')
+    if (!preset) throw new Error('Expected SHORT preset to exist')
+
+    act(() => {
+      result.current.applyVowelPreset('SHORT')
+    })
+
+    expect(new Set(result.current.selectedVowelIds)).toEqual(new Set(preset.vowelIds))
+    expect(result.current.activeVowelPresetLabel).toBe('Short Vowels')
+  })
+
+  it('applyVowelPreset removes a preset when clicked again', () => {
+    const { result } = renderHook(() => useContentSelection())
+
+    act(() => {
+      result.current.applyVowelPreset('SHORT')
+    })
+    act(() => {
+      result.current.applyVowelPreset('SHORT')
+    })
+
+    expect(result.current.selectedVowelIds).toHaveLength(0)
+    expect(result.current.activeVowelPresetLabel).toBe('Presets')
+  })
+
+  it('applyVowelPreset merges overlapping presets and removes only the toggled group', () => {
+    const { result } = renderHook(() => useContentSelection())
+    const short = getVowelPresetById('SHORT')
+    const formChanging = getVowelPresetById('FORM_CHANGING')
+    if (!short || !formChanging) throw new Error('Expected vowel presets to exist')
+
+    act(() => {
+      result.current.applyVowelPreset('SHORT')
+      result.current.applyVowelPreset('FORM_CHANGING')
+    })
+
+    expect(result.current.activeVowelPresetLabel).toBe('Custom')
+    expect(new Set(result.current.selectedVowelIds)).toEqual(
+      new Set([...short.vowelIds, ...formChanging.vowelIds])
+    )
+
+    act(() => {
+      result.current.applyVowelPreset('FORM_CHANGING')
+    })
+
+    expect(new Set(result.current.selectedVowelIds)).toEqual(
+      new Set(short.vowelIds.filter((id) => !formChanging.vowelIds.includes(id)))
+    )
+    expect(result.current.activeVowelPresetLabel).toBe('Custom')
+  })
+
+  it('applyVowelPreset removes a fully selected preset from a custom selection', () => {
+    const { result } = renderHook(() => useContentSelection())
+    const short = getVowelPresetById('SHORT')
+    const extraId = 'า'
+    if (!short) throw new Error('Expected SHORT preset to exist')
+
+    act(() => {
+      result.current.applyVowelPreset('SHORT')
+      result.current.toggleVowel(extraId)
+    })
+
+    expect(result.current.activeVowelPresetLabel).toBe('Custom')
+
+    act(() => {
+      result.current.applyVowelPreset('SHORT')
+    })
+
+    expect(result.current.selectedVowelIds).toEqual([extraId])
+    expect(result.current.activeVowelPresetLabel).toBe('Custom')
+  })
+
   it('selectAllVowels and clearVowels work', () => {
     const { result } = renderHook(() => useContentSelection())
     act(() => {
@@ -157,5 +231,19 @@ describe('useContentSelection', () => {
       result.current.clearVowels()
     })
     expect(result.current.selectedVowelIds).toHaveLength(0)
+  })
+
+  it('clearVowels clears vowels added by presets', () => {
+    const { result } = renderHook(() => useContentSelection())
+
+    act(() => {
+      result.current.applyVowelPreset('LONG')
+    })
+    act(() => {
+      result.current.clearVowels()
+    })
+
+    expect(result.current.selectedVowelIds).toHaveLength(0)
+    expect(result.current.activeVowelPresetLabel).toBe('Presets')
   })
 })

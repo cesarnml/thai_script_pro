@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ContentSelection } from './ContentSelection'
 import { THAI_CONSONANTS, getConsonantPresetById } from '../data/consonants'
-import { THAI_VOWELS, formatVowelWithPlaceholder } from '../data/vowels'
+import { THAI_VOWELS, formatVowelWithPlaceholder, getVowelPresetById } from '../data/vowels'
 
 describe('ContentSelection', () => {
   it('renders a Consonants section with heading', () => {
@@ -202,6 +202,132 @@ describe('ContentSelection', () => {
     expect(screen.getByRole('heading', { name: /vowels/i })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /select all.*vowel/i }))
     expect(screen.getByText(new RegExp(`${THAI_VOWELS.length} vowels?`, 'i'))).toBeInTheDocument()
+  })
+
+  it('renders a presets dropdown for vowels', () => {
+    render(<ContentSelection />)
+    expect(screen.getByRole('button', { name: /vowel presets/i })).toHaveTextContent('Presets')
+  })
+
+  it('shows all vowel preset options with their full labels when opened', async () => {
+    const user = userEvent.setup()
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+
+    expect(screen.getByRole('listbox', { name: /vowel preset options/i })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /^Short Vowels/i })).toHaveAttribute(
+      'title',
+      'Short-duration vowel forms'
+    )
+    expect(screen.getByRole('option', { name: /^Long Vowels/i })).toHaveAttribute(
+      'title',
+      'Long-duration vowel forms'
+    )
+    expect(screen.getByRole('option', { name: /^Monophthongs/i })).toHaveAttribute(
+      'title',
+      'Simple vowel sounds with one mouth position'
+    )
+    expect(screen.getByRole('option', { name: /^Diphthongs/i })).toHaveAttribute(
+      'title',
+      'Compound vowel sounds'
+    )
+    expect(screen.getByRole('option', { name: /^Form-Changing/i })).toHaveAttribute(
+      'title',
+      'Vowels that commonly shift shape in closed syllables'
+    )
+  })
+
+  it('selecting a vowel preset marks the expected vowels selected', async () => {
+    const user = userEvent.setup()
+    const short = getVowelPresetById('SHORT')
+    if (!short) throw new Error('Expected SHORT preset to exist')
+
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Short Vowels/i }))
+
+    expect(screen.getByRole('button', { name: /vowel presets/i })).toHaveTextContent('Short Vowels')
+    expect(
+      screen.getByText(new RegExp(`${short.vowelIds.length} of ${THAI_VOWELS.length} selected`, 'i'))
+    ).toBeInTheDocument()
+
+    short.vowelIds.forEach((id) => {
+      expect(screen.getByRole('button', { name: formatVowelWithPlaceholder(id) })).toHaveAttribute(
+        'aria-pressed',
+        'true'
+      )
+    })
+  })
+
+  it('selecting overlapping vowel presets yields Custom', async () => {
+    const user = userEvent.setup()
+    const short = getVowelPresetById('SHORT')
+    const formChanging = getVowelPresetById('FORM_CHANGING')
+    if (!short || !formChanging) throw new Error('Expected vowel presets to exist')
+
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Short Vowels/i }))
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Form-Changing/i }))
+
+    expect(screen.getByRole('button', { name: /vowel presets/i })).toHaveTextContent('Custom')
+    expect(
+      screen.getByText(
+        new RegExp(`${new Set([...short.vowelIds, ...formChanging.vowelIds]).size} of ${THAI_VOWELS.length} selected`, 'i')
+      )
+    ).toBeInTheDocument()
+  })
+
+  it('clicking a checked vowel preset row deselects that group', async () => {
+    const user = userEvent.setup()
+    const short = getVowelPresetById('SHORT')
+    if (!short) throw new Error('Expected SHORT preset to exist')
+
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Short Vowels/i }))
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Short Vowels/i }))
+
+    expect(screen.getByRole('button', { name: /vowel presets/i })).toHaveTextContent('Presets')
+    expect(screen.getByText(new RegExp(`0 of ${THAI_VOWELS.length} selected`, 'i'))).toBeInTheDocument()
+
+    short.vowelIds.forEach((id) => {
+      expect(screen.getByRole('button', { name: formatVowelWithPlaceholder(id) })).toHaveAttribute(
+        'aria-pressed',
+        'false'
+      )
+    })
+  })
+
+  it('keeps a vowel preset row checked in Custom state and lets the user toggle it off', async () => {
+    const user = userEvent.setup()
+    const short = getVowelPresetById('SHORT')
+    if (!short) throw new Error('Expected SHORT preset to exist')
+
+    render(<ContentSelection />)
+
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Short Vowels/i }))
+    await user.click(screen.getByRole('button', { name: new RegExp(`^${formatVowelWithPlaceholder('า')}$`) }))
+
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+    const presetOption = screen.getByRole('option', { name: /^Short Vowels/i })
+    expect(presetOption).toHaveAttribute('aria-selected', 'true')
+
+    await user.click(presetOption)
+
+    expect(screen.getByRole('button', { name: /vowel presets/i })).toHaveTextContent('Custom')
+    expect(screen.getByText(new RegExp(`1 of ${THAI_VOWELS.length} selected`, 'i'))).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: new RegExp(`^${formatVowelWithPlaceholder('า')}$`) })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
   })
 
   it('shows vowels with a placeholder dash', () => {
