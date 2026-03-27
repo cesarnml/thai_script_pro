@@ -8,6 +8,11 @@ import {
   type SheetConfig,
 } from '../data/sheetOptions'
 import { THAI_VOWELS, formatVowelWithPlaceholder } from '../data/vowels'
+import {
+  buildWorksheetSubtitle,
+  EMPTY_WORKSHEET_MESSAGE,
+  WORKSHEET_TITLE,
+} from '../data/worksheetContent'
 
 export interface DownloadPracticePdfArgs {
   selectedConsonantIds: string[]
@@ -97,7 +102,6 @@ const SECONDARY_TEXT_COLOR: RgbColor = [99, 102, 107]
 const SUBTITLE_COLOR: RgbColor = [156, 163, 175]
 const GHOST_BASE_COLOR: RgbColor = [156, 163, 175]
 const PDF_FILENAME = 'thai-script-practice.pdf'
-const WORKSHEET_TITLE = 'Thai Script Pro'
 const BLOCK_YIELD_INTERVAL = 4
 
 const PDF_FONT_FAMILIES: Record<string, PdfFontFamily> = {
@@ -200,18 +204,6 @@ function getPdfLayout(doc: PdfDocLike, config: SheetConfig): PdfLayout {
     gridGapY: GRID_GAP_Y,
     blockGapY: BLOCK_GAP_Y,
   }
-}
-
-function buildSubtitle(consonantCount: number, vowelCount: number, fontLabel: string): string {
-  const totalChars = consonantCount + vowelCount
-  const charType =
-    consonantCount > 0 && vowelCount > 0
-      ? 'Characters'
-      : consonantCount > 0
-        ? 'Consonants'
-        : 'Vowels'
-
-  return `Thai ${charType} Writing Practice · ${totalChars} ${charType.toLowerCase()} · ${fontLabel}`
 }
 
 function getGridHeight(config: SheetConfig, layout: PdfLayout): number {
@@ -393,11 +385,11 @@ export async function buildPracticePdf(doc: PdfDocLike, args: DownloadPracticePd
   const fontFamily = getPdfFontFamily(args.config.font)
   const fontLabel = args.config.font.charAt(0).toUpperCase() + args.config.font.slice(1)
   const blocks = getPdfBlocks(args)
-  const subtitle = buildSubtitle(
-    args.selectedConsonantIds.length,
-    args.selectedVowelIds.length,
-    fontLabel
-  )
+  const subtitle = buildWorksheetSubtitle({
+    consonantCount: args.selectedConsonantIds.length,
+    vowelCount: args.selectedVowelIds.length,
+    fontLabel,
+  })
 
   let currentY = drawDocumentHeader(doc, layout, subtitle, fontFamily)
 
@@ -405,7 +397,7 @@ export async function buildPracticePdf(doc: PdfDocLike, args: DownloadPracticePd
     doc.setFont(fontFamily.regular.fontName)
     doc.setFontSize(12)
     doc.setTextColor(...SUBTITLE_COLOR)
-    doc.text('Select consonants or vowels to see preview.', layout.pageWidth / 2, currentY + 24, {
+    doc.text(EMPTY_WORKSHEET_MESSAGE, layout.pageWidth / 2, currentY + 24, {
       align: 'center',
     })
     return
