@@ -297,6 +297,7 @@ describe('App', () => {
 
   it('shows an error toast if the PDF export fails', async () => {
     const user = userEvent.setup()
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     downloadPracticePdfMock.mockRejectedValueOnce(new Error('network failure'))
 
     render(<App />)
@@ -305,6 +306,7 @@ describe('App', () => {
 
     expect(await screen.findByText('PDF export failed. Please try again.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /download pdf/i })).toBeEnabled()
+    expect(consoleErrorSpy).toHaveBeenCalled()
   })
 
   it('does not start duplicate PDF exports while one is already in progress', async () => {
