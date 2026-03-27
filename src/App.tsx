@@ -208,6 +208,8 @@ function App() {
           fontFamily={selectedFontFamily}
           onToggleConsonant={selection.toggleConsonant}
           onToggleVowel={selection.toggleVowel}
+          onApplyConsonantPreset={selection.applyConsonantPreset}
+          onApplyVowelPreset={selection.applyVowelPreset}
           onSelectAllConsonants={selection.selectAllConsonants}
           onClearConsonants={selection.clearConsonants}
           onSelectAllVowels={selection.selectAllVowels}

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { formatVowelWithPlaceholder } from './data/vowels'
+import { getConsonantPresetById } from './data/consonants'
+import { THAI_VOWELS, formatVowelWithPlaceholder, getVowelPresetById } from './data/vowels'
 import { DEFAULT_SHEET_CONFIG } from './data/sheetOptions'
 
 const { downloadPracticePdfMock } = vi.hoisted(() => {
@@ -132,6 +133,77 @@ describe('App', () => {
     ).toHaveStyle({
       fontFamily: '"Itim", cursive',
     })
+  })
+
+  it('applies consonant presets through the content selection section', async () => {
+    const user = userEvent.setup()
+    const mc = getConsonantPresetById('MC')
+    if (!mc) throw new Error('Expected MC preset to exist')
+
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Middle Class/i }))
+
+    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveTextContent(
+      'Middle Class'
+    )
+    expect(screen.getByText(new RegExp(`${mc.consonantIds.length} of 44 selected`, 'i'))).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /preview/i })).not.toHaveTextContent(
+      /select consonants or vowels to see preview/i
+    )
+  })
+
+  it('lets the user deselect a checked consonant preset through the dropdown', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Middle Class/i }))
+    await user.click(screen.getByRole('button', { name: /consonant presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Middle Class/i }))
+
+    expect(screen.getByRole('button', { name: /consonant presets/i })).toHaveTextContent('Presets')
+    expect(screen.getByText(/0 of 44 selected/i)).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /preview/i })).toHaveTextContent(
+      /select consonants or vowels to see preview/i
+    )
+  })
+
+  it('applies vowel presets through the content selection section', async () => {
+    const user = userEvent.setup()
+    const short = getVowelPresetById('SHORT')
+    if (!short) throw new Error('Expected SHORT preset to exist')
+
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Short Vowels/i }))
+
+    expect(screen.getByRole('button', { name: /vowel presets/i })).toHaveTextContent(
+      'Short Vowels'
+    )
+    expect(
+      screen.getByText(new RegExp(`${short.vowelIds.length} of ${THAI_VOWELS.length} selected`, 'i'))
+    ).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: /preview/i })).not.toHaveTextContent(
+      /select consonants or vowels to see preview/i
+    )
+  })
+
+  it('lets the user deselect a checked vowel preset through the dropdown', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Short Vowels/i }))
+    await user.click(screen.getByRole('button', { name: /vowel presets/i }))
+    await user.click(screen.getByRole('option', { name: /^Short Vowels/i }))
+
+    expect(screen.getByRole('button', { name: /vowel presets/i })).toHaveTextContent('Presets')
+    expect(screen.getByRole('region', { name: /preview/i })).toHaveTextContent(
+      /select consonants or vowels to see preview/i
+    )
   })
 
   it('auto-clamps columns and ghost copies when switching to a larger font size', async () => {

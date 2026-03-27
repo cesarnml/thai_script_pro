@@ -3,6 +3,13 @@ export interface ThaiVowel {
   char: string
 }
 
+export interface ThaiVowelPreset {
+  id: 'SHORT' | 'LONG'
+  shortLabel: string
+  fullLabel: string
+  vowelIds: string[]
+}
+
 const PREPOSED_VOWELS = new Set(['เ', 'แ', 'โ', 'ใ', 'ไ'])
 const UPPER_VOWEL_MARKS = new Set(['ั', 'ิ', 'ี', 'ึ', 'ื'])
 const LOWER_VOWEL_MARKS = new Set(['ุ', 'ู'])
@@ -93,3 +100,35 @@ export const THAI_VOWELS: ThaiVowel[] = [
   { id: 'เียะ', char: 'เียะ' },
   { id: 'ือะ', char: 'ือะ' },
 ]
+
+export const THAI_VOWEL_PRESETS: ThaiVowelPreset[] = [
+  {
+    id: 'SHORT',
+    shortLabel: 'Short Vowels',
+    fullLabel: 'Short-duration vowel forms',
+    vowelIds: ['ะ', 'ั', 'ิ', 'ึ', 'ุ', 'ฤ', 'ฦ', 'เาะ', 'ัวะ', 'ัะ', 'เียะ', 'ือะ'],
+  },
+  {
+    id: 'LONG',
+    shortLabel: 'Long Vowels',
+    fullLabel: 'Long-duration vowel forms',
+    vowelIds: ['า', 'ำ', 'ี', 'ื', 'ู', 'เ', 'แ', 'โ', 'ใ', 'ไ', 'ฤๅ', 'ฦๅ', 'เีย', 'ือ', 'ัว', 'ียว'],
+  },
+]
+
+export function getVowelPresetById(id: ThaiVowelPreset['id']) {
+  return THAI_VOWEL_PRESETS.find((preset) => preset.id === id)
+}
+
+export function getVowelPresetTriggerLabel(selectedVowelIds: string[]): string {
+  if (selectedVowelIds.length === 0) return 'Presets'
+
+  const selectedSet = new Set(selectedVowelIds)
+  const exactMatch = THAI_VOWEL_PRESETS.find(
+    (preset) =>
+      preset.vowelIds.length === selectedSet.size &&
+      preset.vowelIds.every((id) => selectedSet.has(id))
+  )
+
+  return exactMatch?.shortLabel ?? 'Custom'
+}
