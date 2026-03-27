@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ContentSelection } from './components/ContentSelection'
 import { SheetOptions } from './components/SheetOptions'
 import { Preview } from './components/Preview'
 import { OutputActions } from './components/OutputActions'
 import { useContentSelection } from './hooks/useContentSelection'
+import { useInitialPreviewColumns } from './hooks/useInitialPreviewColumns'
 import { usePdfExport } from './hooks/usePdfExport'
 import {
   DEFAULT_SHEET_CONFIG,
   FONT_FAMILY_MAP,
-  getInitialColumnsForWidth,
   getMaxColumnsForFontSize,
 } from './data/sheetOptions'
 import type { SheetConfig } from './data/sheetOptions'
@@ -29,9 +29,23 @@ function App() {
   const [sheetConfig, setSheetConfig] = useState<SheetConfig>(DEFAULT_SHEET_CONFIG)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const toastTimeoutRef = useRef<number | null>(null)
-  const previewRootRef = useRef<HTMLDivElement>(null)
-  const hasInitializedColumnsRef = useRef(false)
   const selectedFontFamily = FONT_FAMILY_MAP[sheetConfig.font] || '"Sarabun", sans-serif'
+  const handleInitialPreviewColumns = useCallback(
+    ({ columns, ghostCopiesPerRow }: { columns: number; ghostCopiesPerRow: number }) => {
+      setSheetConfig((current) => ({
+        ...current,
+        columns,
+        ghostCopiesPerRow,
+      }))
+    },
+    []
+  )
+  const { previewRootRef } = useInitialPreviewColumns({
+    fontSize: sheetConfig.fontSize,
+    columns: sheetConfig.columns,
+    ghostCopiesPerRow: sheetConfig.ghostCopiesPerRow,
+    onInitialize: handleInitialPreviewColumns,
+  })
   const { handleDownloadPdf, pdfExportState } = usePdfExport({
     selectedConsonantIds: selection.selectedConsonantIds,
     selectedVowelIds: selection.selectedVowelIds,
@@ -40,30 +54,6 @@ function App() {
       setToastMessage('PDF export failed. Please try again.')
     },
   })
-
-  useEffect(() => {
-    if (hasInitializedColumnsRef.current) return
-
-    const previewRoot = previewRootRef.current
-    const previewSurface = previewRoot?.querySelector<HTMLElement>('[data-preview-surface="true"]')
-    if (!previewSurface) return
-
-    const styles = window.getComputedStyle(previewSurface)
-    const paddingLeft = Number.parseFloat(styles.paddingLeft) || 0
-    const paddingRight = Number.parseFloat(styles.paddingRight) || 0
-    const availableWidthPx = Math.max(0, previewSurface.clientWidth - paddingLeft - paddingRight)
-    const initialColumns = getInitialColumnsForWidth(sheetConfig.fontSize, availableWidthPx)
-
-    hasInitializedColumnsRef.current = true
-
-    if (initialColumns === sheetConfig.columns) return
-
-    setSheetConfig((current) => ({
-      ...current,
-      columns: initialColumns,
-      ghostCopiesPerRow: Math.min(current.ghostCopiesPerRow, initialColumns),
-    }))
-  }, [sheetConfig.columns, sheetConfig.fontSize])
 
   useEffect(() => {
     if (!toastMessage) return
