@@ -1,5 +1,7 @@
 # PRD: Thai Script Writing Practice App (MVP)
 
+> Historical planning document. This PRD captures the original MVP target, not the exact current implementation. For the shipped behavior in this repository, see [CURRENT_STATE.md](./CURRENT_STATE.md).
+
 ## 1. Product overview
 
 **Name (working):** Thai Script Pro (or TBD).
