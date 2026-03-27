@@ -52,9 +52,13 @@ describe('App', () => {
     }
   })
 
-  it('renders app title Thai Script Pro', () => {
+  it('renders the Thai Script Pro hero copy', () => {
     render(<App />)
-    expect(screen.getByRole('heading', { name: /thai script pro/i })).toBeInTheDocument()
+    expect(screen.getByText('Thai Script Pro')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /thai worksheet generator/i })).toBeInTheDocument()
+    expect(
+      screen.getByText('Create polished printable Thai writing sheets in seconds.')
+    ).toBeInTheDocument()
   })
 
   it('renders content selection, sheet options, preview, and output actions', () => {

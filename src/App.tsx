@@ -187,15 +187,14 @@ function App() {
     <div className="min-h-screen bg-slate-950">
       <div className="text-center pt-12 pb-8 px-4">
         <p className="text-indigo-400 text-xs font-semibold tracking-[0.3em] uppercase mb-3">
-          ก บ ท &middot; Practice
+          Thai Script Pro
         </p>
         <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
           <span className="sr-only">Thai Script Pro — </span>
-          Thai Writing Practice
+          Thai Worksheet Generator
         </h1>
         <p className="text-gray-400 text-sm max-w-md mx-auto">
-          Select consonants below and generate a printable practice sheet with
-          traceable guides.
+          Create polished printable Thai writing sheets in seconds.
         </p>
       </div>
 
