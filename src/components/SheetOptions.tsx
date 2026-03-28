@@ -21,8 +21,12 @@ const labelClasses =
 
 export function SheetOptions({ config, onChange }: SheetOptionsProps) {
   const allowedColumnOptions = getAllowedColumnOptions(config.fontSize)
-  const fallbackColumns = allowedColumnOptions[allowedColumnOptions.length - 1]?.value ?? config.columns
-  const selectedColumns = allowedColumnOptions.some((option) => option.value === config.columns)
+  const fallbackColumns =
+    allowedColumnOptions[allowedColumnOptions.length - 1]?.value ??
+    config.columns
+  const selectedColumns = allowedColumnOptions.some(
+    (option) => option.value === config.columns,
+  )
     ? config.columns
     : fallbackColumns
 
@@ -39,7 +43,10 @@ export function SheetOptions({ config, onChange }: SheetOptionsProps) {
   }
 
   return (
-    <section className="bg-white rounded-2xl p-6 shadow-sm" aria-label="Sheet options">
+    <section
+      className="bg-white rounded-2xl p-6 shadow-sm"
+      aria-label="Sheet options"
+    >
       <h2 className="text-lg font-bold text-gray-900 mb-4">Sheet Options</h2>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
@@ -50,7 +57,9 @@ export function SheetOptions({ config, onChange }: SheetOptionsProps) {
           <select
             id="rows-per-char"
             value={config.rowsPerCharacter}
-            onChange={(e) => update({ rowsPerCharacter: Number(e.target.value) || 1 })}
+            onChange={(e) =>
+              update({ rowsPerCharacter: Number(e.target.value) || 1 })
+            }
             className={selectClasses}
           >
             {ROWS_PER_CHARACTER_OPTIONS.map((o) => (
@@ -86,11 +95,17 @@ export function SheetOptions({ config, onChange }: SheetOptionsProps) {
           <select
             id="ghost-copies"
             value={config.ghostCopiesPerRow}
-            onChange={(e) => update({ ghostCopiesPerRow: Number(e.target.value) || 1 })}
+            onChange={(e) =>
+              update({ ghostCopiesPerRow: Number(e.target.value) || 1 })
+            }
             className={selectClasses}
           >
             {GHOST_COPIES_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value} disabled={o.value > config.columns}>
+              <option
+                key={o.value}
+                value={o.value}
+                disabled={o.value > config.columns}
+              >
                 {o.label}
               </option>
             ))}

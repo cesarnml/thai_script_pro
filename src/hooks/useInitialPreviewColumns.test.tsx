@@ -11,7 +11,10 @@ function TestHarness({
   fontSize?: string
   columns?: number
   ghostCopiesPerRow?: number
-  onInitialize?: (adjustment: { columns: number; ghostCopiesPerRow: number }) => void
+  onInitialize?: (adjustment: {
+    columns: number
+    ghostCopiesPerRow: number
+  }) => void
 }) {
   const { previewRootRef } = useInitialPreviewColumns({
     fontSize,
@@ -28,7 +31,10 @@ function TestHarness({
 }
 
 describe('useInitialPreviewColumns', () => {
-  const originalClientWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth')
+  const originalClientWidth = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'clientWidth',
+  )
 
   beforeEach(() => {
     vi.restoreAllMocks()
@@ -36,7 +42,11 @@ describe('useInitialPreviewColumns', () => {
 
   afterEach(() => {
     if (originalClientWidth) {
-      Object.defineProperty(HTMLElement.prototype, 'clientWidth', originalClientWidth)
+      Object.defineProperty(
+        HTMLElement.prototype,
+        'clientWidth',
+        originalClientWidth,
+      )
     } else {
       Reflect.deleteProperty(HTMLElement.prototype, 'clientWidth')
     }

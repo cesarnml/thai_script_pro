@@ -12,7 +12,10 @@ export function OutputActions({
   statusMessage,
 }: OutputActionsProps) {
   return (
-    <section className="flex flex-col items-end gap-2" aria-label="Output actions">
+    <section
+      className="flex flex-col items-end gap-2"
+      aria-label="Output actions"
+    >
       <button
         type="button"
         onClick={onDownloadPdf}
@@ -28,7 +31,13 @@ export function OutputActions({
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
-            <circle className="opacity-25" cx="12" cy="12" r="10" strokeWidth="3" />
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              strokeWidth="3"
+            />
             <path
               className="opacity-90"
               strokeLinecap="round"
@@ -38,7 +47,13 @@ export function OutputActions({
             />
           </svg>
         ) : (
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg
+            className="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

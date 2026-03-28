@@ -119,8 +119,12 @@ describe('buildPracticePdf', () => {
       config,
     })
 
-    expect(textRecords.some((record) => record.fontName === 'Prompt-SemiBold')).toBe(true)
-    expect(textRecords.some((record) => record.fontName === 'Prompt-Regular')).toBe(true)
+    expect(
+      textRecords.some((record) => record.fontName === 'Prompt-SemiBold'),
+    ).toBe(true)
+    expect(
+      textRecords.some((record) => record.fontName === 'Prompt-Regular'),
+    ).toBe(true)
   })
 
   it('draws model glyphs centered with a middle baseline at the cell midpoint', async () => {
@@ -147,7 +151,7 @@ describe('buildPracticePdf', () => {
         record.text === firstConsonant.char &&
         record.fontName === 'Sarabun-SemiBold' &&
         record.options?.align === 'center' &&
-        record.options?.baseline === 'middle'
+        record.options?.baseline === 'middle',
     )
 
     expect(modelGlyph).toBeDefined()
@@ -176,15 +180,21 @@ describe('buildPracticePdf', () => {
 
     const thaiLines = await runGuideTest('thai')
     expect(thaiLines).toHaveLength(3)
-    expect(thaiLines.every((line) => line.color.join(',') === '200,230,201')).toBe(true)
+    expect(
+      thaiLines.every((line) => line.color.join(',') === '200,230,201'),
+    ).toBe(true)
 
     const crossLines = await runGuideTest('cross')
     expect(crossLines).toHaveLength(2)
-    expect(crossLines.every((line) => line.color.join(',') === '224,224,224')).toBe(true)
+    expect(
+      crossLines.every((line) => line.color.join(',') === '224,224,224'),
+    ).toBe(true)
 
     const sandwichLines = await runGuideTest('sandwich')
     expect(sandwichLines).toHaveLength(2)
-    expect(sandwichLines.every((line) => line.color.join(',') === '224,224,224')).toBe(true)
+    expect(
+      sandwichLines.every((line) => line.color.join(',') === '224,224,224'),
+    ).toBe(true)
   })
 
   it('uses preblended ghost colors that follow the existing opacity progression', async () => {
@@ -206,7 +216,7 @@ describe('buildPracticePdf', () => {
         record.text === firstConsonant.char &&
         record.fontName === 'Sarabun-Regular' &&
         record.options?.align === 'center' &&
-        record.options?.baseline === 'middle'
+        record.options?.baseline === 'middle',
     )
 
     expect(ghostGlyphs).toHaveLength(3)
@@ -257,7 +267,7 @@ describe('buildPracticePdf', () => {
         record.text === firstConsonant.char &&
         record.fontName === 'Sarabun-SemiBold' &&
         record.options?.align === 'center' &&
-        record.options?.baseline === 'middle'
+        record.options?.baseline === 'middle',
     )
 
     expect(modelGlyph).toBeDefined()
@@ -266,10 +276,16 @@ describe('buildPracticePdf', () => {
 
   it('emits generation progress while building large exports', async () => {
     const { doc } = createMockDoc()
-    const progressStates: Array<{ phase: string; completed?: number; total?: number }> = []
+    const progressStates: Array<{
+      phase: string
+      completed?: number
+      total?: number
+    }> = []
 
     const args: DownloadPracticePdfArgs = {
-      selectedConsonantIds: THAI_CONSONANTS.slice(0, 6).map((consonant) => consonant.id),
+      selectedConsonantIds: THAI_CONSONANTS.slice(0, 6).map(
+        (consonant) => consonant.id,
+      ),
       selectedVowelIds: [],
       config: {
         ...DEFAULT_SHEET_CONFIG,
@@ -285,7 +301,11 @@ describe('buildPracticePdf', () => {
     await buildPracticePdf(doc, args)
 
     expect(progressStates).toHaveLength(6)
-    expect(progressStates[0]).toEqual({ phase: 'generating', completed: 1, total: 6 })
+    expect(progressStates[0]).toEqual({
+      phase: 'generating',
+      completed: 1,
+      total: 6,
+    })
     expect(progressStates[progressStates.length - 1]).toEqual({
       phase: 'generating',
       completed: 6,
@@ -300,7 +320,9 @@ describe('downloadPracticePdf', () => {
     const progressStates: string[] = []
     const createObjectURL = vi.fn(() => 'blob:pdf')
     const revokeObjectURL = vi.fn()
-    const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+    const anchorClick = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => {})
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       arrayBuffer: async () => new TextEncoder().encode('font').buffer,
@@ -313,7 +335,7 @@ describe('downloadPracticePdf', () => {
         constructor() {
           return doc
         }
-      } as unknown as (...args: any[]) => any
+      } as unknown as (...args: unknown[]) => PdfDocLike,
     )
     vi.stubGlobal('fetch', fetchMock)
     Object.defineProperty(URL, 'createObjectURL', {

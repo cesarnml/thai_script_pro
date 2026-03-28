@@ -17,21 +17,23 @@ function arrayBufferToBinaryString(buffer: ArrayBuffer): string {
 }
 
 function buildFontUrl(fileName: string): string {
-  return new URL(`${import.meta.env.BASE_URL}fonts/${fileName}`, window.location.origin).toString()
+  return new URL(
+    `${import.meta.env.BASE_URL}fonts/${fileName}`,
+    window.location.origin,
+  ).toString()
 }
 
 async function loadFontBinary(fileName: string): Promise<string> {
   const cached = loadedFontFiles.get(fileName)
   if (cached) return cached
 
-  const fontPromise = fetch(buildFontUrl(fileName))
-    .then(async (response) => {
-      if (!response.ok) {
-        throw new Error(`Failed to load PDF font: ${fileName}`)
-      }
+  const fontPromise = fetch(buildFontUrl(fileName)).then(async (response) => {
+    if (!response.ok) {
+      throw new Error(`Failed to load PDF font: ${fileName}`)
+    }
 
-      return arrayBufferToBinaryString(await response.arrayBuffer())
-    })
+    return arrayBufferToBinaryString(await response.arrayBuffer())
+  })
 
   loadedFontFiles.set(fileName, fontPromise)
   return fontPromise

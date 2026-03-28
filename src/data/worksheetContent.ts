@@ -1,5 +1,6 @@
 export const WORKSHEET_TITLE = 'Thai Script Pro'
-export const EMPTY_WORKSHEET_MESSAGE = 'Select consonants or vowels to see preview.'
+export const EMPTY_WORKSHEET_MESSAGE =
+  'Select consonants or vowels to see preview.'
 
 export interface WorksheetSummaryArgs {
   consonantCount: number
@@ -7,7 +8,10 @@ export interface WorksheetSummaryArgs {
   fontLabel: string
 }
 
-export function getWorksheetCharacterLabel(consonantCount: number, vowelCount: number): string {
+export function getWorksheetCharacterLabel(
+  consonantCount: number,
+  vowelCount: number,
+): string {
   if (consonantCount > 0 && vowelCount > 0) return 'Characters'
   if (consonantCount > 0) return 'Consonants'
   return 'Vowels'

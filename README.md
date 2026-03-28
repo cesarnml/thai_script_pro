@@ -38,6 +38,11 @@ For the implemented product and current constraints, start with [docs/CURRENT_ST
 
 ```bash
 pnpm install   # install dependencies
+pnpm format    # apply Prettier formatting
+pnpm format:check  # verify formatting without changing files
+pnpm lint      # run ESLint
+pnpm lint:fix  # run ESLint with autofixes
+pnpm check     # run formatting, lint, tests, and build
 pnpm dev       # start dev server (http://localhost:5173)
 pnpm build     # production build
 pnpm preview   # preview production build
@@ -69,7 +74,12 @@ The dev server runs at [http://localhost:5173](http://localhost:5173) by default
 
 ## Testing
 
-`pnpm test:run` executes the current unit and component suite. The repository does not currently include Playwright or any E2E test setup.
+`pnpm test:run` executes the current unit and component suite. `pnpm test:e2e` runs the Playwright smoke test in `e2e/`.
+
+## CI and quality gates
+
+GitHub Actions runs formatting, linting, tests, and build checks for pull requests and pushes to `main`.
+To block merges until those checks pass, configure a branch protection rule or ruleset on `main` and require the `quality` status check.
 
 ## Contributor conventions
 

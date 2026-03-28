@@ -32,16 +32,25 @@ describe('THAI_CONSONANTS', () => {
   })
 
   it('defines the four consonant presets with valid memberships', () => {
-    const consonantIds = new Set(THAI_CONSONANTS.map((consonant) => consonant.id))
+    const consonantIds = new Set(
+      THAI_CONSONANTS.map((consonant) => consonant.id),
+    )
 
-    expect(THAI_CONSONANT_PRESETS.map((preset) => preset.id)).toEqual(['LCG1', 'LCG2', 'MC', 'HC'])
+    expect(THAI_CONSONANT_PRESETS.map((preset) => preset.id)).toEqual([
+      'LCG1',
+      'LCG2',
+      'MC',
+      'HC',
+    ])
 
     for (const preset of THAI_CONSONANT_PRESETS) {
       expect(preset.shortLabel.length).toBeGreaterThan(0)
       expect(preset.fullLabel.length).toBeGreaterThan(0)
       expect(preset.colorKey in CONSONANT_GROUP_COLOR_CLASSES).toBe(true)
       expect(preset.consonantIds.length).toBeGreaterThan(0)
-      preset.consonantIds.forEach((id) => expect(consonantIds.has(id)).toBe(true))
+      preset.consonantIds.forEach((id) =>
+        expect(consonantIds.has(id)).toBe(true),
+      )
     }
   })
 
@@ -49,7 +58,8 @@ describe('THAI_CONSONANTS', () => {
     for (const consonant of THAI_CONSONANTS) {
       const preset = getConsonantPresetByConsonantId(consonant.id)
       expect(preset).toBeDefined()
-      if (!preset) throw new Error(`Expected preset for consonant ${consonant.id}`)
+      if (!preset)
+        throw new Error(`Expected preset for consonant ${consonant.id}`)
       expect(preset.colorKey in CONSONANT_GROUP_COLOR_CLASSES).toBe(true)
     }
   })

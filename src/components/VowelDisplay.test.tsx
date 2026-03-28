@@ -7,7 +7,7 @@ const COMBINING_MARKS = new Set(['ั', 'ิ', 'ี', 'ึ', 'ื', '็', 'ํ'
 function getLeafSpans(container: HTMLElement) {
   const ariaHidden = container.querySelector('[aria-hidden="true"]')!
   return Array.from(ariaHidden.querySelectorAll('span')).filter(
-    (s) => s.children.length === 0
+    (s) => s.children.length === 0,
   )
 }
 
@@ -17,7 +17,11 @@ describe('VowelDisplay', () => {
 
   it('renders placeholder อ with placeholderClassName for a simple suffix vowel (ะ)', () => {
     const { container } = render(
-      <VowelDisplay char="ะ" glyphClassName={GLYPH} placeholderClassName={PLACEHOLDER} />
+      <VowelDisplay
+        char="ะ"
+        glyphClassName={GLYPH}
+        placeholderClassName={PLACEHOLDER}
+      />,
     )
     const spans = getLeafSpans(container)
     const placeholder = spans.find((s) => s.textContent === 'อ')
@@ -28,7 +32,11 @@ describe('VowelDisplay', () => {
 
   it('renders composite glyph with upper mark in glyphClassName (ิ)', () => {
     const { container } = render(
-      <VowelDisplay char="ิ" glyphClassName={GLYPH} placeholderClassName={PLACEHOLDER} />
+      <VowelDisplay
+        char="ิ"
+        glyphClassName={GLYPH}
+        placeholderClassName={PLACEHOLDER}
+      />,
     )
     const spans = getLeafSpans(container)
     const glyph = spans.find((s) => s.textContent === 'อิ')
@@ -38,7 +46,11 @@ describe('VowelDisplay', () => {
 
   it('renders composite glyph with lower mark in glyphClassName (ุ)', () => {
     const { container } = render(
-      <VowelDisplay char="ุ" glyphClassName={GLYPH} placeholderClassName={PLACEHOLDER} />
+      <VowelDisplay
+        char="ุ"
+        glyphClassName={GLYPH}
+        placeholderClassName={PLACEHOLDER}
+      />,
     )
     const spans = getLeafSpans(container)
     const glyph = spans.find((s) => s.textContent === 'อุ')
@@ -48,7 +60,11 @@ describe('VowelDisplay', () => {
 
   it('renders prefix with glyphClassName (เ)', () => {
     const { container } = render(
-      <VowelDisplay char="เ" glyphClassName={GLYPH} placeholderClassName={PLACEHOLDER} />
+      <VowelDisplay
+        char="เ"
+        glyphClassName={GLYPH}
+        placeholderClassName={PLACEHOLDER}
+      />,
     )
     const spans = getLeafSpans(container)
     const prefix = spans.find((s) => s.textContent === 'เ')
@@ -58,7 +74,11 @@ describe('VowelDisplay', () => {
 
   it('renders suffix with glyphClassName (า in ำ)', () => {
     const { container } = render(
-      <VowelDisplay char="ำ" glyphClassName={GLYPH} placeholderClassName={PLACEHOLDER} />
+      <VowelDisplay
+        char="ำ"
+        glyphClassName={GLYPH}
+        placeholderClassName={PLACEHOLDER}
+      />,
     )
     const spans = getLeafSpans(container)
     const suffix = spans.find((s) => s.textContent === 'า')
@@ -70,13 +90,20 @@ describe('VowelDisplay', () => {
     const vowelsWithMarks = ['ั', 'ิ', 'ี', 'ึ', 'ื', 'ุ', 'ู']
     for (const char of vowelsWithMarks) {
       const { container } = render(
-        <VowelDisplay char={char} glyphClassName={GLYPH} placeholderClassName={PLACEHOLDER} />
+        <VowelDisplay
+          char={char}
+          glyphClassName={GLYPH}
+          placeholderClassName={PLACEHOLDER}
+        />,
       )
       const spans = getLeafSpans(container)
       const placeholder = spans.find(
-        (s) => s.textContent === 'อ' && s.className.includes(PLACEHOLDER)
+        (s) => s.textContent === 'อ' && s.className.includes(PLACEHOLDER),
       )
-      expect(placeholder, `placeholder อ overlay missing for vowel ${char}`).toBeDefined()
+      expect(
+        placeholder,
+        `placeholder อ overlay missing for vowel ${char}`,
+      ).toBeDefined()
       expect(placeholder!.className).not.toContain(GLYPH)
     }
   })
@@ -85,14 +112,18 @@ describe('VowelDisplay', () => {
     const vowelsWithMarks = ['ั', 'ิ', 'ี', 'ึ', 'ื', 'ุ', 'ู', 'ำ']
     for (const char of vowelsWithMarks) {
       const { container } = render(
-        <VowelDisplay char={char} glyphClassName={GLYPH} placeholderClassName={PLACEHOLDER} />
+        <VowelDisplay
+          char={char}
+          glyphClassName={GLYPH}
+          placeholderClassName={PLACEHOLDER}
+        />,
       )
       for (const span of getLeafSpans(container)) {
         const text = span.textContent || ''
         const firstChar = Array.from(text)[0]
         expect(
           COMBINING_MARKS.has(firstChar),
-          `Span text "${text}" for vowel ${char} starts with a combining mark — would render a dotted circle`
+          `Span text "${text}" for vowel ${char} starts with a combining mark — would render a dotted circle`,
         ).toBe(false)
       }
     }

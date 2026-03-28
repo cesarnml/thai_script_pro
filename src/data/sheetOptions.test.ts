@@ -95,15 +95,15 @@ describe('COLUMNS_OPTIONS', () => {
   })
 
   it('filters the rendered column options to the allowed max', () => {
-    expect(getAllowedColumnOptions('small').map((option) => option.value)).toEqual([
-      3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-    ])
-    expect(getAllowedColumnOptions('medium').map((option) => option.value)).toEqual([
-      3, 4, 5, 6, 7, 8, 9,
-    ])
-    expect(getAllowedColumnOptions('large').map((option) => option.value)).toEqual([
-      3, 4, 5, 6, 7,
-    ])
+    expect(
+      getAllowedColumnOptions('small').map((option) => option.value),
+    ).toEqual([3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+    expect(
+      getAllowedColumnOptions('medium').map((option) => option.value),
+    ).toEqual([3, 4, 5, 6, 7, 8, 9])
+    expect(
+      getAllowedColumnOptions('large').map((option) => option.value),
+    ).toEqual([3, 4, 5, 6, 7])
   })
 
   it('derives initial columns from available width without exceeding the printable cap', () => {
@@ -119,7 +119,7 @@ describe('COLUMNS_OPTIONS', () => {
         fontSize: 'large',
         columns: 12,
         ghostCopiesPerRow: 10,
-      })
+      }),
     ).toEqual({
       ...DEFAULT_SHEET_CONFIG,
       fontSize: 'large',
@@ -141,7 +141,7 @@ describe('COLUMNS_OPTIONS', () => {
     })
 
     expect(getSheetConfigClampNotice(previousConfig, nextConfig)).toBe(
-      'Adjusted to 7 columns so it fits on the page.'
+      'Adjusted to 7 columns so it fits on the page.',
     )
   })
 

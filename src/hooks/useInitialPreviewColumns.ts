@@ -26,13 +26,18 @@ export function useInitialPreviewColumns({
     if (hasInitializedColumnsRef.current) return
 
     const previewRoot = previewRootRef.current
-    const previewSurface = previewRoot?.querySelector<HTMLElement>('[data-preview-surface="true"]')
+    const previewSurface = previewRoot?.querySelector<HTMLElement>(
+      '[data-preview-surface="true"]',
+    )
     if (!previewSurface) return
 
     const styles = window.getComputedStyle(previewSurface)
     const paddingLeft = Number.parseFloat(styles.paddingLeft) || 0
     const paddingRight = Number.parseFloat(styles.paddingRight) || 0
-    const availableWidthPx = Math.max(0, previewSurface.clientWidth - paddingLeft - paddingRight)
+    const availableWidthPx = Math.max(
+      0,
+      previewSurface.clientWidth - paddingLeft - paddingRight,
+    )
     const initialColumns = getInitialColumnsForWidth(fontSize, availableWidthPx)
 
     hasInitializedColumnsRef.current = true
