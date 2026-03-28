@@ -111,7 +111,7 @@ export function ConsonantSelectionSection({
               onClick={() => onToggleConsonant(consonant.id)}
               aria-pressed={consonantSet.has(consonant.id)}
               style={fontStyle}
-              className={`flex flex-col items-center py-2.5 px-1 rounded-xl border transition-colors ${
+              className={`flex items-center justify-center py-4 px-1 rounded-xl border transition-colors ${
                 colorClasses
                   ? consonantSet.has(consonant.id)
                     ? colorClasses.tileActive
@@ -122,23 +122,12 @@ export function ConsonantSelectionSection({
               }`}
             >
               <span
-                className="text-2xl leading-tight"
+                className="text-4xl leading-none"
                 translate="no"
                 lang="th"
               >
                 {consonant.char}
               </span>
-              {consonant.name && (
-                <span
-                  className={`text-[10px] mt-0.5 truncate max-w-full ${
-                    colorClasses ? colorClasses.tileMeta : 'text-gray-400'
-                  }`}
-                  translate="no"
-                  lang="th"
-                >
-                  {consonant.name}
-                </span>
-              )}
             </button>
           )
         })}

@@ -450,20 +450,15 @@ describe('ContentSelection', () => {
     ).toBeInTheDocument()
   })
 
-  it('marks visible Thai consonant glyphs and names as non-translatable', () => {
+  it('marks visible Thai consonant glyphs as non-translatable', () => {
     const { container } = render(<ContentSelection />)
     const firstConsonant = THAI_CONSONANTS[0]
 
     const glyph = Array.from(container.querySelectorAll('span')).find(
       (node) => node.textContent === firstConsonant.char,
     )
-    const name = Array.from(container.querySelectorAll('span')).find(
-      (node) => node.textContent === firstConsonant.name,
-    )
 
     expect(glyph).toHaveAttribute('translate', 'no')
     expect(glyph).toHaveAttribute('lang', 'th')
-    expect(name).toHaveAttribute('translate', 'no')
-    expect(name).toHaveAttribute('lang', 'th')
   })
 })
