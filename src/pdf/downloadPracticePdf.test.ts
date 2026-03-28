@@ -308,7 +308,13 @@ describe('downloadPracticePdf', () => {
     const originalCreateObjectURL = URL.createObjectURL
     const originalRevokeObjectURL = URL.revokeObjectURL
 
-    jsPDFConstructorMock.mockReturnValue(doc)
+    jsPDFConstructorMock.mockImplementation(
+      class MockJsPDF {
+        constructor() {
+          return doc
+        }
+      } as unknown as (...args: any[]) => any
+    )
     vi.stubGlobal('fetch', fetchMock)
     Object.defineProperty(URL, 'createObjectURL', {
       configurable: true,
