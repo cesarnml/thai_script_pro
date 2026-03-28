@@ -1,7 +1,4 @@
-import {
-  formatVowelWithPlaceholder,
-  splitVowelForDisplay,
-} from '@/data/vowels'
+import { formatVowelWithPlaceholder, splitVowelForDisplay } from '@/data/vowels'
 
 interface VowelDisplayProps {
   char: string
