@@ -1,13 +1,13 @@
 import { describe, it, expect, vi } from 'vitest'
 import { THAI_CONSONANTS } from '@/data/consonants'
 import { DEFAULT_SHEET_CONFIG, type SheetConfig } from '@/data/sheetOptions'
-import type { DownloadPracticePdfArgs } from './downloadPracticePdf'
+import type { DownloadPracticePdfArgs } from '@/pdf/downloadPracticePdf'
 import {
   buildPracticePdf,
   downloadPracticePdf,
   getGhostTextColor,
   type PdfDocLike,
-} from './downloadPracticePdf'
+} from '@/pdf/downloadPracticePdf'
 
 const { jsPDFConstructorMock } = vi.hoisted(() => ({
   jsPDFConstructorMock: vi.fn(),

@@ -1,6 +1,6 @@
 import { render, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useInitialPreviewColumns } from './useInitialPreviewColumns'
+import { useInitialPreviewColumns } from '@/hooks/useInitialPreviewColumns'
 
 function TestHarness({
   fontSize = 'medium',

@@ -13,7 +13,7 @@ import {
   getMaxColumnsForFontSize,
   normalizeSheetConfig,
   type SheetConfig,
-} from './sheetOptions'
+} from '@/data/sheetOptions'
 
 describe('GRID_GUIDE_OPTIONS', () => {
   it('has exactly 3 options (Cross, Sandwich, Thai)', () => {

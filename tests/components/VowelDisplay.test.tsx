@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
-import { VowelDisplay } from './VowelDisplay'
+import { VowelDisplay } from '@/components/VowelDisplay'
 
 const COMBINING_MARKS = new Set(['ั', 'ิ', 'ี', 'ึ', 'ื', '็', 'ํ', 'ุ', 'ู'])
 

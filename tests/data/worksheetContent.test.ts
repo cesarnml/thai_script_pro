@@ -4,7 +4,7 @@ import {
   EMPTY_WORKSHEET_MESSAGE,
   getWorksheetCharacterLabel,
   WORKSHEET_TITLE,
-} from './worksheetContent'
+} from '@/data/worksheetContent'
 
 describe('worksheetContent', () => {
   it('exposes non-empty shared worksheet copy', () => {

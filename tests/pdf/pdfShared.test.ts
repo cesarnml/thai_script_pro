@@ -7,7 +7,7 @@ import {
   getPdfFontFamily,
   getPdfLayout,
   type PdfDocLike,
-} from './pdfShared'
+} from '@/pdf/pdfShared'
 
 function createMockDoc(width = 595.28, height = 841.89): PdfDocLike {
   return {

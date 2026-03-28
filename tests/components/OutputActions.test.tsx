@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { OutputActions } from './OutputActions'
+import { OutputActions } from '@/components/OutputActions'
 
 describe('OutputActions', () => {
   const mockOnDownloadPdf = vi.fn()

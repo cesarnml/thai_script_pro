@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DEFAULT_SHEET_CONFIG } from '@/data/sheetOptions'
-import { usePdfExport } from './usePdfExport'
+import { usePdfExport } from '@/hooks/usePdfExport'
 
 function createDeferred<T = void>() {
   let resolve!: (value: T | PromiseLike<T>) => void

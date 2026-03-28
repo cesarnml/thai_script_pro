@@ -4,7 +4,7 @@ import {
   THAI_VOWEL_PRESETS,
   formatVowelWithPlaceholder,
   splitVowelForDisplay,
-} from './vowels'
+} from '@/data/vowels'
 
 describe('THAI_VOWELS', () => {
   it('has at least 28 vowels (PRD: ~32; exact TBD)', () => {

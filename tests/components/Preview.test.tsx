@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { THAI_CONSONANTS } from '@/data/consonants'
 import { DEFAULT_SHEET_CONFIG } from '@/data/sheetOptions'
 import { THAI_VOWELS, formatVowelWithPlaceholder } from '@/data/vowels'
-import { Preview } from './Preview'
+import { Preview } from '@/components/Preview'
 
 describe('Preview', () => {
   it('shows an empty-state prompt when no characters are selected', () => {

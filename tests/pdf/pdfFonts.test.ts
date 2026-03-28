@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { registerPdfFonts } from './pdfFonts'
-import type { PdfDocLike } from './pdfShared'
+import { registerPdfFonts } from '@/pdf/pdfFonts'
+import type { PdfDocLike } from '@/pdf/pdfShared'
 
 function createMockDoc(): PdfDocLike {
   return {

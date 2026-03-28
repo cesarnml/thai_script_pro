@@ -4,7 +4,7 @@ import {
   THAI_CONSONANTS,
   THAI_CONSONANT_PRESETS,
   getConsonantPresetByConsonantId,
-} from './consonants'
+} from '@/data/consonants'
 
 describe('THAI_CONSONANTS', () => {
   it('has exactly 44 consonants', () => {

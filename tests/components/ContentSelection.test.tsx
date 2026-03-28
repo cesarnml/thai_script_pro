@@ -7,7 +7,7 @@ import {
   formatVowelWithPlaceholder,
   getVowelPresetById,
 } from '@/data/vowels'
-import { ContentSelection } from './ContentSelection'
+import { ContentSelection } from '@/components/ContentSelection'
 
 describe('ContentSelection', () => {
   it('renders a Consonants section with heading', () => {
