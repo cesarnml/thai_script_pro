@@ -109,7 +109,7 @@ export const THAI_CONSONANT_PRESETS: ThaiConsonantPreset[] = [
 export const CONSONANT_GROUP_COLOR_CLASSES = {
   teal: {
     tileIdle:
-      'border-teal-200 bg-teal-50/70 text-teal-900 hover:bg-teal-100/80',
+      'border-teal-100 bg-teal-50/10 text-teal-900 hover:bg-teal-100/60',
     tileActive:
       'border-teal-300 bg-teal-100 ring-1 ring-teal-200 text-teal-950',
     tileMeta: 'text-teal-700',
@@ -121,7 +121,7 @@ export const CONSONANT_GROUP_COLOR_CLASSES = {
   },
   amber: {
     tileIdle:
-      'border-amber-200 bg-amber-50/70 text-amber-900 hover:bg-amber-100/80',
+      'border-amber-100 bg-amber-50/10 text-amber-900 hover:bg-amber-100/60',
     tileActive:
       'border-amber-300 bg-amber-100 ring-1 ring-amber-200 text-amber-950',
     tileMeta: 'text-amber-700',
@@ -134,7 +134,7 @@ export const CONSONANT_GROUP_COLOR_CLASSES = {
   },
   indigo: {
     tileIdle:
-      'border-indigo-200 bg-indigo-50/70 text-indigo-900 hover:bg-indigo-100/80',
+      'border-indigo-100 bg-indigo-50/10 text-indigo-900 hover:bg-indigo-100/60',
     tileActive:
       'border-indigo-300 bg-indigo-100 ring-1 ring-indigo-200 text-indigo-950',
     tileMeta: 'text-indigo-700',
@@ -147,7 +147,7 @@ export const CONSONANT_GROUP_COLOR_CLASSES = {
   },
   rose: {
     tileIdle:
-      'border-rose-200 bg-rose-50/70 text-rose-900 hover:bg-rose-100/80',
+      'border-rose-100 bg-rose-50/10 text-rose-900 hover:bg-rose-100/60',
     tileActive:
       'border-rose-300 bg-rose-100 ring-1 ring-rose-200 text-rose-950',
     tileMeta: 'text-rose-700',
