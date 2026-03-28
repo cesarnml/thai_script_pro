@@ -26,6 +26,15 @@ For the implemented product and current constraints, start with [docs/CURRENT_ST
 - Preview the worksheet before export
 - Download an A4 PDF with embedded Thai-capable fonts and progress feedback
 
+## MVP contract
+
+The active MVP in this repo is intentionally narrower than the original historical planning docs:
+
+- Output is `PDF download` only
+- Paper size is fixed to `A4`
+- The shipped font set is `Traditional`, `Modern`, and `Cursive`
+- Expanding scope for phase 2 is blocked until MVP docs, tests, and E2E coverage are aligned
+
 ## Stack
 
 - React 19 + TypeScript
@@ -37,7 +46,7 @@ For the implemented product and current constraints, start with [docs/CURRENT_ST
 ## Commands
 
 ```bash
-pnpm install   # install dependencies
+pnpm install   # required first step in a fresh worktree
 pnpm format    # apply Prettier formatting
 pnpm format:check  # verify formatting without changing files
 pnpm lint      # run ESLint
@@ -59,6 +68,16 @@ pnpm install
 pnpm test:e2e:install
 pnpm test:e2e
 ```
+
+## Fresh worktree bootstrap
+
+When you create a new ephemeral worktree, run `pnpm install` before drawing conclusions from failed checks. Until dependencies exist locally, `pnpm test:run`, `pnpm build`, and `pnpm test:e2e` will fail for environment reasons rather than product reasons.
+
+Recommended personal workflow:
+
+- Use a local wrapper, alias, or script for worktree creation that immediately runs `pnpm install`
+- Keep this as personal automation, not repo logic
+- Use this repo verification order in every new worktree: `pnpm install`, `pnpm test:run`, `pnpm test:e2e`
 
 The dev server runs at [http://localhost:5173](http://localhost:5173) by default.
 
