@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { DEFAULT_SHEET_CONFIG } from '../data/sheetOptions'
+import { DEFAULT_SHEET_CONFIG } from '@/data/sheetOptions'
 import { usePdfExport } from './usePdfExport'
 
 function createDeferred<T = void>() {

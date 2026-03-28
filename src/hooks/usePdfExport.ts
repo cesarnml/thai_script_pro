@@ -1,10 +1,10 @@
 import { useCallback, useRef, useState } from 'react'
-import type { SheetConfig } from '../data/sheetOptions'
 import {
   downloadPracticePdf,
   type DownloadPracticePdfArgs,
   type PdfExportProgress,
-} from '../pdf/downloadPracticePdf'
+} from '@/pdf/downloadPracticePdf'
+import type { SheetConfig } from '@/data/sheetOptions'
 
 type PdfExportPhase =
   | 'idle'

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
-import { THAI_CONSONANTS } from '../data/consonants'
-import { DEFAULT_SHEET_CONFIG, type SheetConfig } from '../data/sheetOptions'
+import { THAI_CONSONANTS } from '@/data/consonants'
+import { DEFAULT_SHEET_CONFIG, type SheetConfig } from '@/data/sheetOptions'
 import type { DownloadPracticePdfArgs } from './downloadPracticePdf'
 import {
   buildPracticePdf,

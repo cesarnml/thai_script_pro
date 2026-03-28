@@ -1,5 +1,5 @@
 import { jsPDF } from 'jspdf'
-import type { SheetConfig } from '../data/sheetOptions'
+import type { SheetConfig } from '@/data/sheetOptions'
 import { registerPdfFonts } from './pdfFonts'
 import { buildPracticePdf } from './pdfDocument'
 import {

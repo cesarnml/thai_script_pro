@@ -1,16 +1,16 @@
-import type { SheetConfig } from '../data/sheetOptions'
-import { THAI_CONSONANTS } from '../data/consonants'
-import { THAI_VOWELS } from '../data/vowels'
+import { THAI_CONSONANTS } from '@/data/consonants'
 import {
   FONT_OPTIONS,
   FONT_FAMILY_MAP,
   FONT_SIZE_MAP,
-} from '../data/sheetOptions'
+  type SheetConfig,
+} from '@/data/sheetOptions'
+import { THAI_VOWELS } from '@/data/vowels'
 import {
   buildWorksheetSubtitle,
   EMPTY_WORKSHEET_MESSAGE,
   WORKSHEET_TITLE,
-} from '../data/worksheetContent'
+} from '@/data/worksheetContent'
 import { VowelDisplay } from './VowelDisplay'
 
 interface PreviewProps {

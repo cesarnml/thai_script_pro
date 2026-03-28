@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { getConsonantPresetById } from './data/consonants'
-import { THAI_VOWELS, getVowelPresetById } from './data/vowels'
-import { DEFAULT_SHEET_CONFIG } from './data/sheetOptions'
+import App from '@/App'
+import { getConsonantPresetById } from '@/data/consonants'
+import { DEFAULT_SHEET_CONFIG } from '@/data/sheetOptions'
+import { THAI_VOWELS, getVowelPresetById } from '@/data/vowels'
 
 const { downloadPracticePdfMock } = vi.hoisted(() => {
   return {
@@ -11,11 +12,9 @@ const { downloadPracticePdfMock } = vi.hoisted(() => {
   }
 })
 
-vi.mock('./pdf/downloadPracticePdf', () => ({
+vi.mock('@/pdf/downloadPracticePdf', () => ({
   downloadPracticePdf: downloadPracticePdfMock,
 }))
-
-import App from './App'
 
 function createDeferred<T = void>() {
   let resolve!: (value: T | PromiseLike<T>) => void

@@ -1,4 +1,3 @@
-import type { SheetConfig } from '../data/sheetOptions'
 import {
   GRID_GUIDE_OPTIONS,
   FONT_OPTIONS,
@@ -6,7 +5,8 @@ import {
   ROWS_PER_CHARACTER_OPTIONS,
   GHOST_COPIES_OPTIONS,
   getAllowedColumnOptions,
-} from '../data/sheetOptions'
+  type SheetConfig,
+} from '@/data/sheetOptions'
 
 interface SheetOptionsProps {
   config: SheetConfig

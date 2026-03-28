@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_SHEET_CONFIG } from '../data/sheetOptions'
+import { DEFAULT_SHEET_CONFIG } from '@/data/sheetOptions'
 import {
   getAllPdfFonts,
   getBlockHeight,

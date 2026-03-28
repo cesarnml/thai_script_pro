@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { getInitialColumnsForWidth } from '../data/sheetOptions'
+import { getInitialColumnsForWidth } from '@/data/sheetOptions'
 
 export interface InitialPreviewColumnsAdjustment {
   columns: number

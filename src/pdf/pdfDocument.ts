@@ -1,11 +1,11 @@
-import { THAI_CONSONANTS } from '../data/consonants'
-import type { SheetConfig } from '../data/sheetOptions'
-import { THAI_VOWELS, formatVowelWithPlaceholder } from '../data/vowels'
+import { THAI_CONSONANTS } from '@/data/consonants'
+import type { SheetConfig } from '@/data/sheetOptions'
+import { THAI_VOWELS, formatVowelWithPlaceholder } from '@/data/vowels'
 import {
   buildWorksheetSubtitle,
   EMPTY_WORKSHEET_MESSAGE,
   WORKSHEET_TITLE,
-} from '../data/worksheetContent'
+} from '@/data/worksheetContent'
 import type {
   DownloadPracticePdfArgs,
   PdfExportProgress,

@@ -4,7 +4,7 @@ import {
   PDF_PAGE_MARGIN_X_PT,
   PX_TO_PT,
   type SheetConfig,
-} from '../data/sheetOptions'
+} from '@/data/sheetOptions'
 
 export type RgbColor = [number, number, number]
 

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
+import { THAI_CONSONANTS, getConsonantPresetById } from '@/data/consonants'
+import { THAI_VOWELS, getVowelPresetById } from '@/data/vowels'
 import { useContentSelection } from './useContentSelection'
-import { THAI_CONSONANTS, getConsonantPresetById } from '../data/consonants'
-import { THAI_VOWELS, getVowelPresetById } from '../data/vowels'
 
 describe('useContentSelection', () => {
   it('starts with no consonants or vowels selected', () => {

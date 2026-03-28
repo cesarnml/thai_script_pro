@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ContentSelection } from './ContentSelection'
-import { THAI_CONSONANTS, getConsonantPresetById } from '../data/consonants'
+import { THAI_CONSONANTS, getConsonantPresetById } from '@/data/consonants'
 import {
   THAI_VOWELS,
   formatVowelWithPlaceholder,
   getVowelPresetById,
-} from '../data/vowels'
+} from '@/data/vowels'
+import { ContentSelection } from './ContentSelection'
 
 describe('ContentSelection', () => {
   it('renders a Consonants section with heading', () => {

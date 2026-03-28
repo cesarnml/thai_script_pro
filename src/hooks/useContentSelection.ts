@@ -4,13 +4,13 @@ import {
   getConsonantPresetById,
   getConsonantPresetTriggerLabel,
   type ThaiConsonantPreset,
-} from '../data/consonants'
+} from '@/data/consonants'
 import {
   THAI_VOWELS,
   getVowelPresetById,
   getVowelPresetTriggerLabel,
   type ThaiVowelPreset,
-} from '../data/vowels'
+} from '@/data/vowels'
 
 export function useContentSelection() {
   const [selectedConsonantIds, setSelectedConsonantIds] = useState<Set<string>>(

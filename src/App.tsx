@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ContentSelection } from './components/ContentSelection'
-import { SheetOptions } from './components/SheetOptions'
-import { Preview } from './components/Preview'
-import { OutputActions } from './components/OutputActions'
-import { useContentSelection } from './hooks/useContentSelection'
-import { useInitialPreviewColumns } from './hooks/useInitialPreviewColumns'
-import { usePdfExport } from './hooks/usePdfExport'
+import { ContentSelection } from '@/components/ContentSelection'
+import { OutputActions } from '@/components/OutputActions'
+import { Preview } from '@/components/Preview'
+import { SheetOptions } from '@/components/SheetOptions'
 import {
   DEFAULT_SHEET_CONFIG,
   FONT_FAMILY_MAP,
   getSheetConfigClampNotice,
   normalizeSheetConfig,
-} from './data/sheetOptions'
-import type { SheetConfig } from './data/sheetOptions'
+} from '@/data/sheetOptions'
+import { useContentSelection } from '@/hooks/useContentSelection'
+import { useInitialPreviewColumns } from '@/hooks/useInitialPreviewColumns'
+import { usePdfExport } from '@/hooks/usePdfExport'
+import type { SheetConfig } from '@/data/sheetOptions'
 
 function App() {
   const selection = useContentSelection()

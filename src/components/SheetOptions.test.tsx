@@ -1,9 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { useState } from 'react'
+import { DEFAULT_SHEET_CONFIG, type SheetConfig } from '@/data/sheetOptions'
 import { SheetOptions } from './SheetOptions'
-import { DEFAULT_SHEET_CONFIG } from '../data/sheetOptions'
-import type { SheetConfig } from '../data/sheetOptions'
 
 describe('SheetOptions', () => {
   const mockOnChange = vi.fn()

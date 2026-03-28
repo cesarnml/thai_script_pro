@@ -1,4 +1,4 @@
-import { useContentSelection } from '../hooks/useContentSelection'
+import { useContentSelection } from '@/hooks/useContentSelection'
 import {
   CONSONANT_GROUP_COLOR_CLASSES,
   THAI_CONSONANTS,
@@ -7,14 +7,14 @@ import {
   getConsonantPresetByConsonantId,
   getConsonantPresetTriggerLabel,
   type ThaiConsonantPreset,
-} from '../data/consonants'
+} from '@/data/consonants'
 import {
   THAI_VOWELS,
   THAI_VOWEL_PRESETS,
   formatVowelWithPlaceholder,
   getVowelPresetTriggerLabel,
   type ThaiVowelPreset,
-} from '../data/vowels'
+} from '@/data/vowels'
 import { VowelDisplay } from './VowelDisplay'
 import { PresetMenu } from './PresetMenu'
 import { ContentSelectionSection } from './ContentSelectionSection'
