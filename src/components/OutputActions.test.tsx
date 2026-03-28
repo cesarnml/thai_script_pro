@@ -12,7 +12,9 @@ describe('OutputActions', () => {
 
   it('renders Download PDF button', () => {
     render(<OutputActions onDownloadPdf={mockOnDownloadPdf} />)
-    expect(screen.getByRole('button', { name: /download pdf/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /download pdf/i }),
+    ).toBeInTheDocument()
   })
 
   it('calls onDownloadPdf when Download PDF is clicked', async () => {
@@ -29,10 +31,14 @@ describe('OutputActions', () => {
         isDownloading
         downloadLabel="Preparing PDF..."
         statusMessage="Preparing your PDF..."
-      />
+      />,
     )
 
-    expect(screen.getByRole('button', { name: /preparing pdf/i })).toBeDisabled()
-    expect(screen.getByRole('status')).toHaveTextContent('Preparing your PDF...')
+    expect(
+      screen.getByRole('button', { name: /preparing pdf/i }),
+    ).toBeDisabled()
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Preparing your PDF...',
+    )
   })
 })

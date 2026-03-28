@@ -6,7 +6,12 @@ import {
   type PdfExportProgress,
 } from '../pdf/downloadPracticePdf'
 
-type PdfExportPhase = 'idle' | 'preparing' | 'generating' | 'downloading' | 'error'
+type PdfExportPhase =
+  | 'idle'
+  | 'preparing'
+  | 'generating'
+  | 'downloading'
+  | 'error'
 
 export interface PdfExportState {
   phase: PdfExportPhase
@@ -21,7 +26,10 @@ const IDLE_PDF_EXPORT_STATE: PdfExportState = {
 }
 
 async function waitForNextPaint(): Promise<void> {
-  if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.requestAnimationFrame === 'function'
+  ) {
     await new Promise<void>((resolve) => {
       window.requestAnimationFrame(() => resolve())
     })
@@ -36,7 +44,7 @@ async function waitForNextPaint(): Promise<void> {
 function getPdfExportState(
   phase: Exclude<PdfExportPhase, 'idle' | 'error'>,
   completed?: number,
-  total?: number
+  total?: number,
 ): PdfExportState {
   if (phase === 'preparing') {
     return {
@@ -47,7 +55,8 @@ function getPdfExportState(
   }
 
   if (phase === 'generating') {
-    const hasProgress = typeof completed === 'number' && typeof total === 'number' && total > 0
+    const hasProgress =
+      typeof completed === 'number' && typeof total === 'number' && total > 0
     return {
       phase,
       label: hasProgress ? `Building ${completed}/${total}` : 'Building PDF...',
@@ -79,7 +88,9 @@ export function usePdfExport({
   onError,
   downloadPdf = downloadPracticePdf,
 }: UsePdfExportOptions) {
-  const [pdfExportState, setPdfExportState] = useState<PdfExportState>(IDLE_PDF_EXPORT_STATE)
+  const [pdfExportState, setPdfExportState] = useState<PdfExportState>(
+    IDLE_PDF_EXPORT_STATE,
+  )
   const isPdfExportingRef = useRef(false)
 
   const handleDownloadPdf = useCallback(async () => {

@@ -54,7 +54,7 @@
 - **Font:** dropdown with the following options; **default: Noto Serif Thai**.
   - Noto Sans Thai
   - Noto Sans Thai Looped
-  - Noto Serif Thai *(default)*
+  - Noto Serif Thai _(default)_
   - Mali
   - Playpen Sans Thai
 - **Font size:** dropdown for character size on the practice sheet. Provide a small set of sensible options (e.g., Small / Medium / Large, or specific point sizes such as 18pt, 24pt, 32pt) so the sheet is readable when printed.
@@ -115,7 +115,7 @@
 - **Components:** Shadcn with Base UI.
 - **Testing:** Vitest (unit and component tests) with React Testing Library and user-event, Playwright (e2e tests). Vitest + RTL is used for fast feedback during TDD; Playwright for full user-flow validation. See §9.1 for component-testing approach.
 
-*(If you need to specify versions, PDF library, or how Shadcn and Base UI are combined, add those details here.)*
+_(If you need to specify versions, PDF library, or how Shadcn and Base UI are combined, add those details here.)_
 
 ---
 
@@ -130,13 +130,13 @@
 
 Component tests use **Vitest** as the runner with **@testing-library/react** and **@testing-library/user-event**. They assert **behavior and UX** (what the user sees, clicks, and types, and how the UI updates), not implementation details. Playwright remains the place for full user flows; RTL covers one screen or component in isolation.
 
-| PRD area | What to component-test with RTL |
-|----------|---------------------------------|
-| **4.1 Content selection** | Selecting/deselecting consonants and vowels; "Select all" and "Clear"; selection count or summary text updates. |
+| PRD area                    | What to component-test with RTL                                                                                                                                  |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **4.1 Content selection**   | Selecting/deselecting consonants and vowels; "Select all" and "Clear"; selection count or summary text updates.                                                  |
 | **4.2 Sheet configuration** | Changing rows per character, ghost copies, paper size, grid guide, font, and font size; correct options in dropdowns and that changes update state or callbacks. |
-| **4.3 Preview** | Preview section receives the right props/state and re-renders when selection or options change (no need to assert pixel-perfect layout). |
-| **4.4 Output** | "Print" and "Download PDF" buttons are present and invoke the correct handlers (mock `window.print` and PDF generation). |
-| **4.5 Responsive** | Optional: render at different viewport widths and assert key controls remain present and usable (e.g. no horizontal scroll for main flows). |
+| **4.3 Preview**             | Preview section receives the right props/state and re-renders when selection or options change (no need to assert pixel-perfect layout).                         |
+| **4.4 Output**              | "Print" and "Download PDF" buttons are present and invoke the correct handlers (mock `window.print` and PDF generation).                                         |
+| **4.5 Responsive**          | Optional: render at different viewport widths and assert key controls remain present and usable (e.g. no horizontal scroll for main flows).                      |
 
 **Boundaries:** Use RTL for one section or component at a time; mock print and PDF generation. Use Playwright for full-page, real-browser flows (select → configure → preview → print/PDF). Avoid duplicating full-flow coverage in both layers.
 

@@ -98,7 +98,8 @@ export const FONT_FAMILY_MAP: Record<string, string> = {
 export function getMaxColumnsForFontSize(fontSize: string): number {
   const cellPx = (FONT_SIZE_MAP[fontSize] || FONT_SIZE_MAP.medium).cellPx
   const narrowestPageWidthPt = Math.min(PDF_A4_WIDTH_PT, PDF_LETTER_WIDTH_PT)
-  const printableWidthPx = (narrowestPageWidthPt - PDF_PAGE_MARGIN_X_PT * 2) / PX_TO_PT
+  const printableWidthPx =
+    (narrowestPageWidthPt - PDF_PAGE_MARGIN_X_PT * 2) / PX_TO_PT
   const computedMax = Math.floor(printableWidthPx / cellPx)
   const maxConfigured = COLUMNS_OPTIONS[COLUMNS_OPTIONS.length - 1].value
   const minConfigured = COLUMNS_OPTIONS[0].value
@@ -111,7 +112,10 @@ export function getAllowedColumnOptions(fontSize: string) {
   return COLUMNS_OPTIONS.filter((option) => option.value <= maxColumns)
 }
 
-export function getInitialColumnsForWidth(fontSize: string, availableWidthPx: number): number {
+export function getInitialColumnsForWidth(
+  fontSize: string,
+  availableWidthPx: number,
+): number {
   const cellPx = (FONT_SIZE_MAP[fontSize] || FONT_SIZE_MAP.medium).cellPx
   const printableMax = getMaxColumnsForFontSize(fontSize)
   const viewportFitMax = Math.floor(availableWidthPx / cellPx)
@@ -135,7 +139,7 @@ export function normalizeSheetConfig(config: SheetConfig): SheetConfig {
 
 export function getSheetConfigClampNotice(
   previousConfig: SheetConfig,
-  nextConfig: SheetConfig
+  nextConfig: SheetConfig,
 ): string | null {
   if (nextConfig.fontSize === previousConfig.fontSize) return null
   if (nextConfig.columns === previousConfig.columns) return null

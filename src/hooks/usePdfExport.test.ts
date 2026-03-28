@@ -18,10 +18,12 @@ function createDeferred<T = void>() {
 describe('usePdfExport', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
-    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback) => {
-      callback(0)
-      return 0
-    })
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
+      (callback: FrameRequestCallback) => {
+        callback(0)
+        return 0
+      },
+    )
   })
 
   it('passes the selected content and config to the PDF downloader', async () => {
@@ -32,7 +34,7 @@ describe('usePdfExport', () => {
         selectedVowelIds: ['sara-a'],
         config: DEFAULT_SHEET_CONFIG,
         downloadPdf,
-      })
+      }),
     )
 
     await act(async () => {
@@ -45,7 +47,7 @@ describe('usePdfExport', () => {
         selectedVowelIds: ['sara-a'],
         config: DEFAULT_SHEET_CONFIG,
         onProgress: expect.any(Function),
-      })
+      }),
     )
   })
 
@@ -61,7 +63,7 @@ describe('usePdfExport', () => {
         selectedVowelIds: [],
         config: DEFAULT_SHEET_CONFIG,
         downloadPdf,
-      })
+      }),
     )
 
     let exportPromise!: Promise<void>
@@ -71,7 +73,9 @@ describe('usePdfExport', () => {
 
     expect(result.current.pdfExportState.phase).toBe('generating')
     expect(result.current.pdfExportState.label).toBe('Building 2/5')
-    expect(result.current.pdfExportState.statusMessage).toBe('Building your PDF pages (2 of 5)...')
+    expect(result.current.pdfExportState.statusMessage).toBe(
+      'Building your PDF pages (2 of 5)...',
+    )
 
     await act(async () => {
       deferred.resolve()
@@ -90,7 +94,7 @@ describe('usePdfExport', () => {
         selectedVowelIds: [],
         config: DEFAULT_SHEET_CONFIG,
         downloadPdf,
-      })
+      }),
     )
 
     let firstExport!: Promise<void>
@@ -113,7 +117,9 @@ describe('usePdfExport', () => {
   it('calls onError when export fails', async () => {
     const onError = vi.fn()
     const downloadPdf = vi.fn().mockRejectedValue(new Error('boom'))
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {})
     const { result } = renderHook(() =>
       usePdfExport({
         selectedConsonantIds: [],
@@ -121,7 +127,7 @@ describe('usePdfExport', () => {
         config: DEFAULT_SHEET_CONFIG,
         downloadPdf,
         onError,
-      })
+      }),
     )
 
     await act(async () => {

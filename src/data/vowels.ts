@@ -25,7 +25,10 @@ export function splitVowelForDisplay(char: string): VowelDisplayParts {
   const parts = Array.from(char)
   let prefixLength = 0
 
-  while (prefixLength < parts.length && PREPOSED_VOWELS.has(parts[prefixLength])) {
+  while (
+    prefixLength < parts.length &&
+    PREPOSED_VOWELS.has(parts[prefixLength])
+  ) {
     prefixLength += 1
   }
 
@@ -106,13 +109,43 @@ export const THAI_VOWEL_PRESETS: ThaiVowelPreset[] = [
     id: 'SHORT',
     shortLabel: 'Short Vowels',
     fullLabel: 'Short-duration vowel forms',
-    vowelIds: ['ะ', 'ั', 'ิ', 'ึ', 'ุ', 'ฤ', 'ฦ', 'เาะ', 'ัวะ', 'ัะ', 'เียะ', 'ือะ'],
+    vowelIds: [
+      'ะ',
+      'ั',
+      'ิ',
+      'ึ',
+      'ุ',
+      'ฤ',
+      'ฦ',
+      'เาะ',
+      'ัวะ',
+      'ัะ',
+      'เียะ',
+      'ือะ',
+    ],
   },
   {
     id: 'LONG',
     shortLabel: 'Long Vowels',
     fullLabel: 'Long-duration vowel forms',
-    vowelIds: ['า', 'ำ', 'ี', 'ื', 'ู', 'เ', 'แ', 'โ', 'ใ', 'ไ', 'ฤๅ', 'ฦๅ', 'เีย', 'ือ', 'ัว', 'ียว'],
+    vowelIds: [
+      'า',
+      'ำ',
+      'ี',
+      'ื',
+      'ู',
+      'เ',
+      'แ',
+      'โ',
+      'ใ',
+      'ไ',
+      'ฤๅ',
+      'ฦๅ',
+      'เีย',
+      'ือ',
+      'ัว',
+      'ียว',
+    ],
   },
 ]
 
@@ -127,7 +160,7 @@ export function getVowelPresetTriggerLabel(selectedVowelIds: string[]): string {
   const exactMatch = THAI_VOWEL_PRESETS.find(
     (preset) =>
       preset.vowelIds.length === selectedSet.size &&
-      preset.vowelIds.every((id) => selectedSet.has(id))
+      preset.vowelIds.every((id) => selectedSet.has(id)),
   )
 
   return exactMatch?.shortLabel ?? 'Custom'

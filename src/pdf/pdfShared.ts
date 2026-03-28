@@ -62,7 +62,12 @@ export interface PdfDocLike {
   setLineDashPattern(dashArray: number[], dashPhase: number): void
   setLineWidth(width: number): void
   setTextColor(r: number, g: number, b: number): void
-  text(text: string, x: number, y: number, options?: Record<string, unknown>): void
+  text(
+    text: string,
+    x: number,
+    y: number,
+    options?: Record<string, unknown>,
+  ): void
 }
 
 export const FIRST_PAGE_TOP_Y = 48
@@ -86,7 +91,10 @@ export const BLOCK_YIELD_INTERVAL = 4
 const PDF_FONT_FAMILIES: Record<string, PdfFontFamily> = {
   traditional: {
     regular: { fileName: 'Sarabun-Regular.ttf', fontName: 'Sarabun-Regular' },
-    semibold: { fileName: 'Sarabun-SemiBold.ttf', fontName: 'Sarabun-SemiBold' },
+    semibold: {
+      fileName: 'Sarabun-SemiBold.ttf',
+      fontName: 'Sarabun-SemiBold',
+    },
   },
   modern: {
     regular: { fileName: 'Prompt-Regular.ttf', fontName: 'Prompt-Regular' },
@@ -99,7 +107,9 @@ const PDF_FONT_FAMILIES: Record<string, PdfFontFamily> = {
 }
 
 export function getPdfFontFamily(fontId: string): PdfFontFamily {
-  return PDF_FONT_FAMILIES[fontId] || PDF_FONT_FAMILIES[DEFAULT_SHEET_CONFIG.font]
+  return (
+    PDF_FONT_FAMILIES[fontId] || PDF_FONT_FAMILIES[DEFAULT_SHEET_CONFIG.font]
+  )
 }
 
 export function getAllPdfFonts(): FontVariant[] {
@@ -121,19 +131,22 @@ export function getGhostTextColor(index: number, total: number): RgbColor {
   const opacity = getGhostOpacity(index, total)
 
   return GHOST_BASE_COLOR.map((channel) =>
-    Math.round(255 - (255 - channel) * opacity)
+    Math.round(255 - (255 - channel) * opacity),
   ) as RgbColor
 }
 
 export function getPdfLayout(doc: PdfDocLike, config: SheetConfig): PdfLayout {
   const pageWidth = doc.internal.pageSize.getWidth()
   const pageHeight = doc.internal.pageSize.getHeight()
-  const rawCellSize = (FONT_SIZE_MAP[config.fontSize] || FONT_SIZE_MAP.medium).cellPx * PX_TO_PT
+  const rawCellSize =
+    (FONT_SIZE_MAP[config.fontSize] || FONT_SIZE_MAP.medium).cellPx * PX_TO_PT
   const maxGridWidth = pageWidth - PDF_PAGE_MARGIN_X_PT * 2
   const gridScale = Math.min(1, maxGridWidth / (rawCellSize * config.columns))
   const cellSize = rawCellSize * gridScale
   const glyphFontSize =
-    (FONT_SIZE_MAP[config.fontSize] || FONT_SIZE_MAP.medium).text * PX_TO_PT * gridScale
+    (FONT_SIZE_MAP[config.fontSize] || FONT_SIZE_MAP.medium).text *
+    PX_TO_PT *
+    gridScale
 
   return {
     pageWidth,
@@ -160,5 +173,10 @@ export function getGridHeight(config: SheetConfig, layout: PdfLayout): number {
 }
 
 export function getBlockHeight(config: SheetConfig, layout: PdfLayout): number {
-  return layout.labelRowHeight + layout.gridGapY + getGridHeight(config, layout) + layout.blockGapY
+  return (
+    layout.labelRowHeight +
+    layout.gridGapY +
+    getGridHeight(config, layout) +
+    layout.blockGapY
+  )
 }

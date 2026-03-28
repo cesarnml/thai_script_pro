@@ -7,7 +7,7 @@
     "moduleResolution": "bundler",
     "composite": true,
     "outDir": ".tsbuild/node",
-    "tsBuildInfoFile": ".tsbuild/tsconfig.node.tsbuildinfo",
+    "tsBuildInfoFile": ".tsbuild/tsconfig.node.tsbuildinfo"
   },
   "include": ["vite.config.ts"]
 }

@@ -12,10 +12,12 @@ describe('Preview', () => {
         selectedConsonantIds={[]}
         selectedVowelIds={[]}
         config={DEFAULT_SHEET_CONFIG}
-      />
+      />,
     )
 
-    expect(screen.getByText(/select consonants or vowels to see preview/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/select consonants or vowels to see preview/i),
+    ).toBeInTheDocument()
   })
 
   it('renders a preview region', () => {
@@ -24,7 +26,7 @@ describe('Preview', () => {
         selectedConsonantIds={[]}
         selectedVowelIds={[]}
         config={DEFAULT_SHEET_CONFIG}
-      />
+      />,
     )
     const region = screen.getByRole('region', { name: /preview/i })
     expect(region).toBeInTheDocument()
@@ -37,7 +39,7 @@ describe('Preview', () => {
         selectedConsonantIds={ids}
         selectedVowelIds={[]}
         config={DEFAULT_SHEET_CONFIG}
-      />
+      />,
     )
     const region = screen.getByRole('region', { name: /preview/i })
     expect(region).toHaveTextContent(THAI_CONSONANTS[0].char)
@@ -50,11 +52,15 @@ describe('Preview', () => {
         selectedConsonantIds={[]}
         selectedVowelIds={[THAI_VOWELS[0].id, THAI_VOWELS[10].id]}
         config={DEFAULT_SHEET_CONFIG}
-      />
+      />,
     )
     const region = screen.getByRole('region', { name: /preview/i })
-    expect(region).toHaveTextContent(formatVowelWithPlaceholder(THAI_VOWELS[0].char))
-    expect(region).toHaveTextContent(formatVowelWithPlaceholder(THAI_VOWELS[10].char))
+    expect(region).toHaveTextContent(
+      formatVowelWithPlaceholder(THAI_VOWELS[0].char),
+    )
+    expect(region).toHaveTextContent(
+      formatVowelWithPlaceholder(THAI_VOWELS[10].char),
+    )
   })
 
   it('updates when selectedConsonantIds changes', () => {
@@ -63,7 +69,7 @@ describe('Preview', () => {
         selectedConsonantIds={[THAI_CONSONANTS[0].id]}
         selectedVowelIds={[]}
         config={DEFAULT_SHEET_CONFIG}
-      />
+      />,
     )
     let region = screen.getByRole('region', { name: /preview/i })
     expect(region).toHaveTextContent(THAI_CONSONANTS[0].char)
@@ -73,11 +79,15 @@ describe('Preview', () => {
         selectedConsonantIds={[THAI_CONSONANTS[1].id]}
         selectedVowelIds={[]}
         config={DEFAULT_SHEET_CONFIG}
-      />
+      />,
     )
     region = screen.getByRole('region', { name: /preview/i })
-    expect(region).not.toHaveTextContent(`${THAI_CONSONANTS[0].char}อ ${THAI_CONSONANTS[0].name}`)
-    expect(region).toHaveTextContent(`${THAI_CONSONANTS[1].char}อ ${THAI_CONSONANTS[1].name}`)
+    expect(region).not.toHaveTextContent(
+      `${THAI_CONSONANTS[0].char}อ ${THAI_CONSONANTS[0].name}`,
+    )
+    expect(region).toHaveTextContent(
+      `${THAI_CONSONANTS[1].char}อ ${THAI_CONSONANTS[1].name}`,
+    )
   })
 
   it('does not show paper size metadata', () => {
@@ -86,9 +96,11 @@ describe('Preview', () => {
         selectedConsonantIds={[THAI_CONSONANTS[0].id]}
         selectedVowelIds={[]}
         config={DEFAULT_SHEET_CONFIG}
-      />
+      />,
     )
-    expect(screen.getByRole('region', { name: /preview/i })).not.toHaveTextContent('A4')
+    expect(
+      screen.getByRole('region', { name: /preview/i }),
+    ).not.toHaveTextContent('A4')
   })
 
   it('shows the semantic font label in preview metadata', () => {
@@ -98,10 +110,12 @@ describe('Preview', () => {
         selectedConsonantIds={[THAI_CONSONANTS[0].id]}
         selectedVowelIds={[]}
         config={config}
-      />
+      />,
     )
 
-    expect(screen.getByRole('region', { name: /preview/i })).toHaveTextContent('Modern')
+    expect(screen.getByRole('region', { name: /preview/i })).toHaveTextContent(
+      'Modern',
+    )
   })
 
   it('marks Thai preview text as non-translatable', () => {
@@ -110,20 +124,22 @@ describe('Preview', () => {
         selectedConsonantIds={[THAI_CONSONANTS[0].id]}
         selectedVowelIds={[THAI_VOWELS[0].id]}
         config={DEFAULT_SHEET_CONFIG}
-      />
+      />,
     )
 
     const worksheetTitle = Array.from(container.querySelectorAll('h3')).find(
-      (node) => node.textContent === 'Thai Script Pro'
+      (node) => node.textContent === 'Thai Script Pro',
     )
     const consonantGlyph = Array.from(container.querySelectorAll('span')).find(
-      (node) => node.textContent === THAI_CONSONANTS[0].char
+      (node) => node.textContent === THAI_CONSONANTS[0].char,
     )
     const consonantName = Array.from(container.querySelectorAll('span')).find(
-      (node) => node.textContent === `${THAI_CONSONANTS[0].char}อ ${THAI_CONSONANTS[0].name}`
+      (node) =>
+        node.textContent ===
+        `${THAI_CONSONANTS[0].char}อ ${THAI_CONSONANTS[0].name}`,
     )
     const vowelGlyphWrapper = container.querySelector(
-      '[aria-hidden="true"][translate="no"][lang="th"]'
+      '[aria-hidden="true"][translate="no"][lang="th"]',
     )
 
     expect(worksheetTitle).toHaveAttribute('translate', 'no')
@@ -140,10 +156,12 @@ describe('Preview', () => {
         selectedConsonantIds={[THAI_CONSONANTS[0].id]}
         selectedVowelIds={[]}
         config={{ ...DEFAULT_SHEET_CONFIG, fontSize: 'small', columns: 12 }}
-      />
+      />,
     )
 
-    expect(screen.queryByText(/scroll sideways to view all columns/i)).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(/scroll sideways to view all columns/i),
+    ).not.toBeInTheDocument()
   })
 
   it('summarizes mixed selections in the preview metadata', () => {
@@ -152,7 +170,7 @@ describe('Preview', () => {
         selectedConsonantIds={[THAI_CONSONANTS[0].id]}
         selectedVowelIds={[THAI_VOWELS[0].id]}
         config={DEFAULT_SHEET_CONFIG}
-      />
+      />,
     )
 
     const region = screen.getByRole('region', { name: /preview/i })

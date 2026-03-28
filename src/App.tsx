@@ -16,19 +16,27 @@ import type { SheetConfig } from './data/sheetOptions'
 
 function App() {
   const selection = useContentSelection()
-  const [sheetConfig, setSheetConfig] = useState<SheetConfig>(DEFAULT_SHEET_CONFIG)
+  const [sheetConfig, setSheetConfig] =
+    useState<SheetConfig>(DEFAULT_SHEET_CONFIG)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const toastTimeoutRef = useRef<number | null>(null)
-  const selectedFontFamily = FONT_FAMILY_MAP[sheetConfig.font] || '"Sarabun", sans-serif'
+  const selectedFontFamily =
+    FONT_FAMILY_MAP[sheetConfig.font] || '"Sarabun", sans-serif'
   const handleInitialPreviewColumns = useCallback(
-    ({ columns, ghostCopiesPerRow }: { columns: number; ghostCopiesPerRow: number }) => {
+    ({
+      columns,
+      ghostCopiesPerRow,
+    }: {
+      columns: number
+      ghostCopiesPerRow: number
+    }) => {
       setSheetConfig((current) => ({
         ...current,
         columns,
         ghostCopiesPerRow,
       }))
     },
-    []
+    [],
   )
   const { previewRootRef } = useInitialPreviewColumns({
     fontSize: sheetConfig.fontSize,
@@ -141,7 +149,12 @@ function App() {
             onClick={dismissToast}
             className="rounded-full p-1 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

@@ -1,7 +1,11 @@
 import type { SheetConfig } from '../data/sheetOptions'
 import { THAI_CONSONANTS } from '../data/consonants'
 import { THAI_VOWELS } from '../data/vowels'
-import { FONT_OPTIONS, FONT_FAMILY_MAP, FONT_SIZE_MAP } from '../data/sheetOptions'
+import {
+  FONT_OPTIONS,
+  FONT_FAMILY_MAP,
+  FONT_SIZE_MAP,
+} from '../data/sheetOptions'
 import {
   buildWorksheetSubtitle,
   EMPTY_WORKSHEET_MESSAGE,
@@ -36,7 +40,10 @@ function PracticeGrid({
   config: SheetConfig
 }) {
   const sz = FONT_SIZE_MAP[config.fontSize] || FONT_SIZE_MAP.medium
-  const firstRowGhostCopies = Math.min(config.ghostCopiesPerRow, Math.max(config.columns - 1, 0))
+  const firstRowGhostCopies = Math.min(
+    config.ghostCopiesPerRow,
+    Math.max(config.columns - 1, 0),
+  )
   const laterRowGhostCopies = Math.min(firstRowGhostCopies + 1, config.columns)
 
   const cellStyle: React.CSSProperties = {
@@ -69,7 +76,9 @@ function PracticeGrid({
     <div>
       {Array.from({ length: config.rowsPerCharacter }).map((_, row) => {
         const isFirstRow = row === 0
-        const ghostCopies = isFirstRow ? firstRowGhostCopies : laterRowGhostCopies
+        const ghostCopies = isFirstRow
+          ? firstRowGhostCopies
+          : laterRowGhostCopies
 
         return (
           <div
@@ -82,7 +91,9 @@ function PracticeGrid({
             {Array.from({ length: config.columns }).map((_, col) => {
               const isModel = isFirstRow && col === 0
               const ghostIdx = isFirstRow ? col - 1 : col
-              const isGhost = isFirstRow ? col > 0 && col <= ghostCopies : col < ghostCopies
+              const isGhost = isFirstRow
+                ? col > 0 && col <= ghostCopies
+                : col < ghostCopies
 
               return (
                 <div key={`${row}-${col}`} style={cellStyle}>
@@ -143,12 +154,19 @@ function PracticeGrid({
   )
 }
 
-export function Preview({ selectedConsonantIds, selectedVowelIds, config }: PreviewProps) {
-  const consonants = THAI_CONSONANTS.filter((c) => selectedConsonantIds.includes(c.id))
+export function Preview({
+  selectedConsonantIds,
+  selectedVowelIds,
+  config,
+}: PreviewProps) {
+  const consonants = THAI_CONSONANTS.filter((c) =>
+    selectedConsonantIds.includes(c.id),
+  )
   const vowels = THAI_VOWELS.filter((v) => selectedVowelIds.includes(v.id))
 
   const fontFamily = FONT_FAMILY_MAP[config.font] || '"Sarabun", sans-serif'
-  const fontLabel = FONT_OPTIONS.find((f) => f.id === config.font)?.label || 'Traditional'
+  const fontLabel =
+    FONT_OPTIONS.find((f) => f.id === config.font)?.label || 'Traditional'
   const totalChars = consonants.length + vowels.length
   const subtitle = buildWorksheetSubtitle({
     consonantCount: consonants.length,
@@ -157,12 +175,13 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
   })
 
   return (
-    <section role="region" aria-label="Preview" className="min-h-[200px]">
+    <section aria-label="Preview" className="min-h-[200px]">
       {totalChars === 0 ? (
-        <div className="bg-white rounded-2xl p-12 text-center" data-preview-surface="true">
-          <p className="text-gray-400 text-sm">
-            {EMPTY_WORKSHEET_MESSAGE}
-          </p>
+        <div
+          className="bg-white rounded-2xl p-12 text-center"
+          data-preview-surface="true"
+        >
+          <p className="text-gray-400 text-sm">{EMPTY_WORKSHEET_MESSAGE}</p>
         </div>
       ) : (
         <div
@@ -176,19 +195,21 @@ export function Preview({ selectedConsonantIds, selectedVowelIds, config }: Prev
           >
             {WORKSHEET_TITLE}
           </h3>
-          <p className="text-center text-sm text-gray-400 mb-8">
-            {subtitle}
-          </p>
+          <p className="text-center text-sm text-gray-400 mb-8">{subtitle}</p>
 
-          <div
-            className="overflow-x-auto pb-2"
-            data-preview-scroll="true"
-          >
-            <div className="min-w-max space-y-8" data-preview-scroll-content="true">
+          <div className="overflow-x-auto pb-2" data-preview-scroll="true">
+            <div
+              className="min-w-max space-y-8"
+              data-preview-scroll-content="true"
+            >
               {consonants.map((c) => (
                 <div key={c.id}>
                   <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-lg font-bold text-gray-900" translate="no" lang="th">
+                    <span
+                      className="text-lg font-bold text-gray-900"
+                      translate="no"
+                      lang="th"
+                    >
                       {c.char}
                     </span>
                     <span

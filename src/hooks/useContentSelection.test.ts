@@ -54,8 +54,12 @@ describe('useContentSelection', () => {
       result.current.applyConsonantPreset('LCG1')
     })
 
-    expect(result.current.selectedConsonantIds.sort()).toEqual([...preset.consonantIds].sort())
-    expect(result.current.activeConsonantPresetLabel).toBe('Low Class - Group 1')
+    expect(result.current.selectedConsonantIds.sort()).toEqual(
+      [...preset.consonantIds].sort(),
+    )
+    expect(result.current.activeConsonantPresetLabel).toBe(
+      'Low Class - Group 1',
+    )
   })
 
   it('applyConsonantPreset removes a preset when clicked again', () => {
@@ -84,7 +88,7 @@ describe('useContentSelection', () => {
     })
 
     expect(new Set(result.current.selectedConsonantIds)).toEqual(
-      new Set([...lcg1.consonantIds, ...mc.consonantIds])
+      new Set([...lcg1.consonantIds, ...mc.consonantIds]),
     )
     expect(result.current.activeConsonantPresetLabel).toBe('Custom')
 
@@ -92,8 +96,12 @@ describe('useContentSelection', () => {
       result.current.applyConsonantPreset('MC')
     })
 
-    expect(new Set(result.current.selectedConsonantIds)).toEqual(new Set(lcg1.consonantIds))
-    expect(result.current.activeConsonantPresetLabel).toBe('Low Class - Group 1')
+    expect(new Set(result.current.selectedConsonantIds)).toEqual(
+      new Set(lcg1.consonantIds),
+    )
+    expect(result.current.activeConsonantPresetLabel).toBe(
+      'Low Class - Group 1',
+    )
   })
 
   it('applyConsonantPreset removes a fully selected preset from a custom selection', () => {
@@ -155,7 +163,9 @@ describe('useContentSelection', () => {
       result.current.applyVowelPreset('SHORT')
     })
 
-    expect(new Set(result.current.selectedVowelIds)).toEqual(new Set(preset.vowelIds))
+    expect(new Set(result.current.selectedVowelIds)).toEqual(
+      new Set(preset.vowelIds),
+    )
     expect(result.current.activeVowelPresetLabel).toBe('Short Vowels')
   })
 
@@ -186,14 +196,16 @@ describe('useContentSelection', () => {
 
     expect(result.current.activeVowelPresetLabel).toBe('Custom')
     expect(new Set(result.current.selectedVowelIds)).toEqual(
-      new Set([...short.vowelIds, ...long.vowelIds])
+      new Set([...short.vowelIds, ...long.vowelIds]),
     )
 
     act(() => {
       result.current.applyVowelPreset('LONG')
     })
 
-    expect(new Set(result.current.selectedVowelIds)).toEqual(new Set(short.vowelIds))
+    expect(new Set(result.current.selectedVowelIds)).toEqual(
+      new Set(short.vowelIds),
+    )
     expect(result.current.activeVowelPresetLabel).toBe('Short Vowels')
   })
 

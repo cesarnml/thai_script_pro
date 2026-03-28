@@ -1,4 +1,7 @@
-import { formatVowelWithPlaceholder, splitVowelForDisplay } from '../data/vowels'
+import {
+  formatVowelWithPlaceholder,
+  splitVowelForDisplay,
+} from '../data/vowels'
 
 interface VowelDisplayProps {
   char: string
@@ -20,7 +23,9 @@ export function VowelDisplay({
   const hasMarks = upper || lower
 
   return (
-    <span className={`inline-flex items-center whitespace-nowrap ${className}`.trim()}>
+    <span
+      className={`inline-flex items-center whitespace-nowrap ${className}`.trim()}
+    >
       {!ariaHidden && <span className="sr-only">{label}</span>}
       <span
         aria-hidden="true"
@@ -32,7 +37,12 @@ export function VowelDisplay({
         {hasMarks ? (
           <span className="relative">
             <span className={glyphClassName}>{`อ${upper}${lower}`}</span>
-            <span className={`absolute inset-0 ${placeholderClassName}`} aria-hidden="true">{'อ'}</span>
+            <span
+              className={`absolute inset-0 ${placeholderClassName}`}
+              aria-hidden="true"
+            >
+              {'อ'}
+            </span>
           </span>
         ) : (
           <span className={placeholderClassName}>อ</span>

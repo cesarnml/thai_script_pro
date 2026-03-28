@@ -6,7 +6,10 @@ import {
   EMPTY_WORKSHEET_MESSAGE,
   WORKSHEET_TITLE,
 } from '../data/worksheetContent'
-import type { DownloadPracticePdfArgs, PdfExportProgress } from './downloadPracticePdf'
+import type {
+  DownloadPracticePdfArgs,
+  PdfExportProgress,
+} from './downloadPracticePdf'
 import {
   BLOCK_YIELD_INTERVAL,
   BORDER_COLOR,
@@ -31,12 +34,18 @@ import {
   THAI_GUIDE_COLOR,
 } from './pdfShared'
 
-function emitProgress(args: DownloadPracticePdfArgs, state: PdfExportProgress): void {
+function emitProgress(
+  args: DownloadPracticePdfArgs,
+  state: PdfExportProgress,
+): void {
   args.onProgress?.(state)
 }
 
 async function yieldToBrowser(): Promise<void> {
-  if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.requestAnimationFrame === 'function'
+  ) {
     await new Promise<void>((resolve) => {
       window.requestAnimationFrame(() => resolve())
     })
@@ -50,7 +59,7 @@ async function yieldToBrowser(): Promise<void> {
 
 function getPdfBlocks(args: DownloadPracticePdfArgs): PdfCharacterBlock[] {
   const consonantBlocks = THAI_CONSONANTS.filter((c) =>
-    args.selectedConsonantIds.includes(c.id)
+    args.selectedConsonantIds.includes(c.id),
   ).map((c) => ({
     primaryLabel: c.char,
     secondaryLabel: `${c.char}อ ${c.name}`,
@@ -58,7 +67,7 @@ function getPdfBlocks(args: DownloadPracticePdfArgs): PdfCharacterBlock[] {
   }))
 
   const vowelBlocks = THAI_VOWELS.filter((v) =>
-    args.selectedVowelIds.includes(v.id)
+    args.selectedVowelIds.includes(v.id),
   ).map((v) => {
     const displayText = formatVowelWithPlaceholder(v.char)
     return {
@@ -74,12 +83,14 @@ function drawDocumentHeader(
   doc: PdfDocLike,
   layout: PdfLayout,
   subtitle: string,
-  fontFamily: PdfFontFamily
+  fontFamily: PdfFontFamily,
 ): number {
   doc.setTextColor(...PRIMARY_TEXT_COLOR)
   doc.setFont(fontFamily.semibold.fontName)
   doc.setFontSize(layout.titleFontSize)
-  doc.text(WORKSHEET_TITLE, layout.pageWidth / 2, layout.topY, { align: 'center' })
+  doc.text(WORKSHEET_TITLE, layout.pageWidth / 2, layout.topY, {
+    align: 'center',
+  })
 
   const subtitleY = layout.topY + 24
   doc.setFont(fontFamily.regular.fontName)
@@ -96,12 +107,14 @@ function drawBlockLabel(
   x: number,
   y: number,
   layout: PdfLayout,
-  fontFamily: PdfFontFamily
+  fontFamily: PdfFontFamily,
 ): void {
   doc.setTextColor(...PRIMARY_TEXT_COLOR)
   doc.setFont(fontFamily.semibold.fontName)
   doc.setFontSize(layout.headerPrimaryFontSize)
-  doc.text(block.primaryLabel, x, y + layout.headerPrimaryFontSize, { baseline: 'bottom' })
+  doc.text(block.primaryLabel, x, y + layout.headerPrimaryFontSize, {
+    baseline: 'bottom',
+  })
 
   if (!block.secondaryLabel) return
 
@@ -111,7 +124,7 @@ function drawBlockLabel(
   doc.text(
     block.secondaryLabel,
     x + layout.headerPrimaryFontSize + 8,
-    y + layout.headerPrimaryFontSize - 1
+    y + layout.headerPrimaryFontSize - 1,
   )
 }
 
@@ -121,7 +134,7 @@ function drawGuideLines(
   y: number,
   size: number,
   guide: string,
-  dash: number
+  dash: number,
 ): void {
   const guideColor = guide === 'thai' ? THAI_GUIDE_COLOR : NEUTRAL_GUIDE_COLOR
   const yQuarter = y + size * 0.25
@@ -158,7 +171,7 @@ function drawGridCell(
   y: number,
   size: number,
   guide: string,
-  dash: number
+  dash: number,
 ): void {
   doc.setLineWidth(BORDER_LINE_WIDTH)
   doc.setDrawColor(...BORDER_COLOR)
@@ -173,7 +186,7 @@ function drawGridGlyph(
   y: number,
   layout: PdfLayout,
   fontName: string,
-  color: RgbColor
+  color: RgbColor,
 ): void {
   doc.setFont(fontName)
   doc.setFontSize(layout.glyphFontSize)
@@ -191,9 +204,12 @@ function drawPracticeGrid(
   y: number,
   config: SheetConfig,
   layout: PdfLayout,
-  fontFamily: PdfFontFamily
+  fontFamily: PdfFontFamily,
 ): void {
-  const firstRowGhostCopies = Math.min(config.ghostCopiesPerRow, Math.max(config.columns - 1, 0))
+  const firstRowGhostCopies = Math.min(
+    config.ghostCopiesPerRow,
+    Math.max(config.columns - 1, 0),
+  )
   const laterRowGhostCopies = Math.min(firstRowGhostCopies + 1, config.columns)
 
   for (let row = 0; row < config.rowsPerCharacter; row += 1) {
@@ -205,9 +221,18 @@ function drawPracticeGrid(
       const cellY = y + row * layout.cellSize
       const isModel = isFirstRow && col === 0
       const ghostIdx = isFirstRow ? col - 1 : col
-      const isGhost = isFirstRow ? col > 0 && col <= ghostCopies : col < ghostCopies
+      const isGhost = isFirstRow
+        ? col > 0 && col <= ghostCopies
+        : col < ghostCopies
 
-      drawGridCell(doc, cellX, cellY, layout.cellSize, config.gridGuide, layout.guideDash)
+      drawGridCell(
+        doc,
+        cellX,
+        cellY,
+        layout.cellSize,
+        config.gridGuide,
+        layout.guideDash,
+      )
 
       if (isModel) {
         drawGridGlyph(
@@ -217,7 +242,7 @@ function drawPracticeGrid(
           cellY,
           layout,
           fontFamily.semibold.fontName,
-          PRIMARY_TEXT_COLOR
+          PRIMARY_TEXT_COLOR,
         )
       }
 
@@ -229,17 +254,21 @@ function drawPracticeGrid(
           cellY,
           layout,
           fontFamily.regular.fontName,
-          getGhostTextColor(ghostIdx, ghostCopies)
+          getGhostTextColor(ghostIdx, ghostCopies),
         )
       }
     }
   }
 }
 
-export async function buildPracticePdf(doc: PdfDocLike, args: DownloadPracticePdfArgs): Promise<void> {
+export async function buildPracticePdf(
+  doc: PdfDocLike,
+  args: DownloadPracticePdfArgs,
+): Promise<void> {
   const layout = getPdfLayout(doc, args.config)
   const fontFamily = getPdfFontFamily(args.config.font)
-  const fontLabel = args.config.font.charAt(0).toUpperCase() + args.config.font.slice(1)
+  const fontLabel =
+    args.config.font.charAt(0).toUpperCase() + args.config.font.slice(1)
   const blocks = getPdfBlocks(args)
   const subtitle = buildWorksheetSubtitle({
     consonantCount: args.selectedConsonantIds.length,
@@ -275,7 +304,7 @@ export async function buildPracticePdf(doc: PdfDocLike, args: DownloadPracticePd
       currentY + LABEL_ROW_HEIGHT + GRID_GAP_Y,
       args.config,
       layout,
-      fontFamily
+      fontFamily,
     )
     currentY += blockHeight
 

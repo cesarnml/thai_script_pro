@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @layer base {
   button:not(:disabled),
@@ -24,26 +24,26 @@
 
 .guide-lines-thai {
   background:
-    repeating-linear-gradient(to right, #c8e6c9 0 6px, transparent 6px 12px) 0 25% / 100% 1px
-      no-repeat,
-    repeating-linear-gradient(to right, #c8e6c9 0 6px, transparent 6px 12px) 0 50% / 100% 1px
-      no-repeat,
-    repeating-linear-gradient(to right, #c8e6c9 0 6px, transparent 6px 12px) 0 75% / 100% 1px
-      no-repeat;
+    repeating-linear-gradient(to right, #c8e6c9 0 6px, transparent 6px 12px) 0
+      25% / 100% 1px no-repeat,
+    repeating-linear-gradient(to right, #c8e6c9 0 6px, transparent 6px 12px) 0
+      50% / 100% 1px no-repeat,
+    repeating-linear-gradient(to right, #c8e6c9 0 6px, transparent 6px 12px) 0
+      75% / 100% 1px no-repeat;
 }
 
 .guide-lines-cross {
   background:
-    repeating-linear-gradient(to right, #e0e0e0 0 6px, transparent 6px 12px) 0 50% / 100% 1px
-      no-repeat,
-    repeating-linear-gradient(to bottom, #e0e0e0 0 6px, transparent 6px 12px) 50% 0 / 1px 100%
-      no-repeat;
+    repeating-linear-gradient(to right, #e0e0e0 0 6px, transparent 6px 12px) 0
+      50% / 100% 1px no-repeat,
+    repeating-linear-gradient(to bottom, #e0e0e0 0 6px, transparent 6px 12px)
+      50% 0 / 1px 100% no-repeat;
 }
 
 .guide-lines-sandwich {
   background:
-    repeating-linear-gradient(to right, #e0e0e0 0 6px, transparent 6px 12px) 0 25% / 100% 1px
-      no-repeat,
-    repeating-linear-gradient(to right, #e0e0e0 0 6px, transparent 6px 12px) 0 75% / 100% 1px
-      no-repeat;
+    repeating-linear-gradient(to right, #e0e0e0 0 6px, transparent 6px 12px) 0
+      25% / 100% 1px no-repeat,
+    repeating-linear-gradient(to right, #e0e0e0 0 6px, transparent 6px 12px) 0
+      75% / 100% 1px no-repeat;
 }

@@ -2,7 +2,12 @@ import { jsPDF } from 'jspdf'
 import type { SheetConfig } from '../data/sheetOptions'
 import { registerPdfFonts } from './pdfFonts'
 import { buildPracticePdf } from './pdfDocument'
-import { PDF_FILENAME, type PdfDocLike, getGhostTextColor, getPdfFontFamily } from './pdfShared'
+import {
+  PDF_FILENAME,
+  type PdfDocLike,
+  getGhostTextColor,
+  getPdfFontFamily,
+} from './pdfShared'
 
 export interface DownloadPracticePdfArgs {
   selectedConsonantIds: string[]
@@ -17,12 +22,18 @@ export interface PdfExportProgress {
   total?: number
 }
 
-function emitProgress(args: DownloadPracticePdfArgs, state: PdfExportProgress): void {
+function emitProgress(
+  args: DownloadPracticePdfArgs,
+  state: PdfExportProgress,
+): void {
   args.onProgress?.(state)
 }
 
 async function yieldToBrowser(): Promise<void> {
-  if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.requestAnimationFrame === 'function'
+  ) {
     await new Promise<void>((resolve) => {
       window.requestAnimationFrame(() => resolve())
     })
@@ -48,7 +59,9 @@ function triggerPdfDownload(blob: Blob, filename: string): void {
   }, 0)
 }
 
-export async function downloadPracticePdf(args: DownloadPracticePdfArgs): Promise<void> {
+export async function downloadPracticePdf(
+  args: DownloadPracticePdfArgs,
+): Promise<void> {
   const doc = new jsPDF({
     format: 'a4',
     orientation: 'portrait',
