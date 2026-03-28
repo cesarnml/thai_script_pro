@@ -1,90 +1,49 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ContentSelection } from './components/ContentSelection'
 import { SheetOptions } from './components/SheetOptions'
 import { Preview } from './components/Preview'
 import { OutputActions } from './components/OutputActions'
 import { useContentSelection } from './hooks/useContentSelection'
+import { useInitialPreviewColumns } from './hooks/useInitialPreviewColumns'
+import { usePdfExport } from './hooks/usePdfExport'
 import {
   DEFAULT_SHEET_CONFIG,
   FONT_FAMILY_MAP,
-  getInitialColumnsForWidth,
-  getMaxColumnsForFontSize,
+  getSheetConfigClampNotice,
+  normalizeSheetConfig,
 } from './data/sheetOptions'
 import type { SheetConfig } from './data/sheetOptions'
-import { downloadPracticePdf } from './pdf/downloadPracticePdf'
-
-type PdfExportPhase = 'idle' | 'preparing' | 'generating' | 'downloading' | 'error'
-
-interface PdfExportState {
-  phase: PdfExportPhase
-  label: string
-  statusMessage: string
-}
-
-const IDLE_PDF_EXPORT_STATE: PdfExportState = {
-  phase: 'idle',
-  label: 'Download PDF',
-  statusMessage: '',
-}
-
-async function waitForNextPaint(): Promise<void> {
-  if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
-    await new Promise<void>((resolve) => {
-      window.requestAnimationFrame(() => resolve())
-    })
-    return
-  }
-
-  await new Promise<void>((resolve) => {
-    setTimeout(resolve, 0)
-  })
-}
-
-function normalizeSheetConfig(config: SheetConfig): SheetConfig {
-  const maxColumns = getMaxColumnsForFontSize(config.fontSize)
-  const columns = Math.min(config.columns, maxColumns)
-
-  return {
-    ...config,
-    columns,
-    ghostCopiesPerRow: Math.min(config.ghostCopiesPerRow, columns),
-  }
-}
 
 function App() {
   const selection = useContentSelection()
   const [sheetConfig, setSheetConfig] = useState<SheetConfig>(DEFAULT_SHEET_CONFIG)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
-  const [pdfExportState, setPdfExportState] = useState<PdfExportState>(IDLE_PDF_EXPORT_STATE)
   const toastTimeoutRef = useRef<number | null>(null)
-  const previewRootRef = useRef<HTMLDivElement>(null)
-  const hasInitializedColumnsRef = useRef(false)
-  const isPdfExportingRef = useRef(false)
   const selectedFontFamily = FONT_FAMILY_MAP[sheetConfig.font] || '"Sarabun", sans-serif'
-
-  useEffect(() => {
-    if (hasInitializedColumnsRef.current) return
-
-    const previewRoot = previewRootRef.current
-    const previewSurface = previewRoot?.querySelector<HTMLElement>('[data-preview-surface="true"]')
-    if (!previewSurface) return
-
-    const styles = window.getComputedStyle(previewSurface)
-    const paddingLeft = Number.parseFloat(styles.paddingLeft) || 0
-    const paddingRight = Number.parseFloat(styles.paddingRight) || 0
-    const availableWidthPx = Math.max(0, previewSurface.clientWidth - paddingLeft - paddingRight)
-    const initialColumns = getInitialColumnsForWidth(sheetConfig.fontSize, availableWidthPx)
-
-    hasInitializedColumnsRef.current = true
-
-    if (initialColumns === sheetConfig.columns) return
-
-    setSheetConfig((current) => ({
-      ...current,
-      columns: initialColumns,
-      ghostCopiesPerRow: Math.min(current.ghostCopiesPerRow, initialColumns),
-    }))
-  }, [sheetConfig.columns, sheetConfig.fontSize])
+  const handleInitialPreviewColumns = useCallback(
+    ({ columns, ghostCopiesPerRow }: { columns: number; ghostCopiesPerRow: number }) => {
+      setSheetConfig((current) => ({
+        ...current,
+        columns,
+        ghostCopiesPerRow,
+      }))
+    },
+    []
+  )
+  const { previewRootRef } = useInitialPreviewColumns({
+    fontSize: sheetConfig.fontSize,
+    columns: sheetConfig.columns,
+    ghostCopiesPerRow: sheetConfig.ghostCopiesPerRow,
+    onInitialize: handleInitialPreviewColumns,
+  })
+  const { handleDownloadPdf, pdfExportState } = usePdfExport({
+    selectedConsonantIds: selection.selectedConsonantIds,
+    selectedVowelIds: selection.selectedVowelIds,
+    config: sheetConfig,
+    onError: () => {
+      setToastMessage('PDF export failed. Please try again.')
+    },
+  })
 
   useEffect(() => {
     if (!toastMessage) return
@@ -112,75 +71,10 @@ function App() {
 
   const handleSheetConfigChange = (nextConfig: SheetConfig) => {
     const normalizedConfig = normalizeSheetConfig(nextConfig)
-
-    if (
-      nextConfig.fontSize !== sheetConfig.fontSize &&
-      normalizedConfig.columns !== sheetConfig.columns
-    ) {
-      setToastMessage(`Adjusted to ${normalizedConfig.columns} columns so it fits on the page.`)
-    }
+    const clampNotice = getSheetConfigClampNotice(sheetConfig, normalizedConfig)
+    if (clampNotice) setToastMessage(clampNotice)
 
     setSheetConfig(normalizedConfig)
-  }
-
-  const updatePdfExportState = (phase: Exclude<PdfExportPhase, 'idle' | 'error'>, completed?: number, total?: number) => {
-    if (phase === 'preparing') {
-      setPdfExportState({
-        phase,
-        label: 'Preparing PDF...',
-        statusMessage: 'Preparing your PDF...',
-      })
-      return
-    }
-
-    if (phase === 'generating') {
-      const hasProgress = typeof completed === 'number' && typeof total === 'number' && total > 0
-      setPdfExportState({
-        phase,
-        label: hasProgress ? `Building ${completed}/${total}` : 'Building PDF...',
-        statusMessage: hasProgress
-          ? `Building your PDF pages (${completed} of ${total})...`
-          : 'Building your PDF pages...',
-      })
-      return
-    }
-
-    setPdfExportState({
-      phase,
-      label: 'Starting download...',
-      statusMessage: 'Starting your PDF download...',
-    })
-  }
-
-  const handleDownloadPdf = async () => {
-    if (isPdfExportingRef.current) return
-
-    isPdfExportingRef.current = true
-    updatePdfExportState('preparing')
-
-    try {
-      await waitForNextPaint()
-
-      await downloadPracticePdf({
-        selectedConsonantIds: selection.selectedConsonantIds,
-        selectedVowelIds: selection.selectedVowelIds,
-        config: sheetConfig,
-        onProgress: ({ phase, completed, total }) => {
-          updatePdfExportState(phase, completed, total)
-        },
-      })
-    } catch (error) {
-      console.error('PDF export failed', error)
-      setPdfExportState({
-        phase: 'error',
-        label: 'Download PDF',
-        statusMessage: '',
-      })
-      setToastMessage('PDF export failed. Please try again.')
-    } finally {
-      isPdfExportingRef.current = false
-      setPdfExportState(IDLE_PDF_EXPORT_STATE)
-    }
   }
 
   return (

@@ -1,5 +1,7 @@
 # How we're building this (TDD in practice)
 
+> Historical process note. This document explains the development approach used during build-out; it is not a current feature spec. For current functionality, see [CURRENT_STATE.md](./CURRENT_STATE.md).
+
 ## The loop you'll see
 
 1. **Red** — We write a test that describes the next behavior we want. The test fails (e.g. "THAI_CONSONANTS has 44 items" when the file is empty or doesn't exist).

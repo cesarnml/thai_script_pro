@@ -1,15 +1,38 @@
 # Thai Script Pro
 
-Web app for generating customizable Thai script practice sheets (consonants and vowels). Select content, set options, preview, and print or download as PDF.
+Thai Script Pro is a Vite + React app for generating printable Thai handwriting practice sheets. Users can choose consonants and vowels, adjust worksheet layout options, preview the result live, and download the worksheet as a PDF.
 
-See [docs/PRD_01_MVP.md](docs/PRD_01_MVP.md) for the product spec and [docs/MVP_TASKS_TDD.md](docs/MVP_TASKS_TDD.md) for the TDD task breakdown. [docs/TDD_APPROACH.md](docs/TDD_APPROACH.md) explains the Red → Green → Refactor loop used in this project.
+For the implemented product and current constraints, start with [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md). The planning docs in `docs/` are still useful background, but they describe earlier MVP intent rather than the exact shipped behavior.
+
+## Current feature set
+
+- Select from all 44 Thai consonants
+- Select from 28 vowel forms
+- Apply consonant presets by class group:
+  - Low Class Group 1
+  - Low Class Group 2
+  - Middle Class
+  - High Class
+- Apply vowel presets:
+  - Short vowels
+  - Long vowels
+- Configure worksheet layout:
+  - Rows per character: `1` to `8`
+  - Columns: auto-constrained by font size and printable page width
+  - Ghost copies per row
+  - Grid guide: `Cross`, `Sandwich`, `Thai`
+  - Font: `Traditional`, `Modern`, `Cursive`
+  - Font size: `Small`, `Medium`, `Large`
+- Preview the worksheet before export
+- Download an A4 PDF with embedded Thai-capable fonts and progress feedback
 
 ## Stack
 
 - React 19 + TypeScript
-- Vite, PNPM
-- TailwindCSS
-- Vitest + React Testing Library (component/unit), Playwright (E2E, to be added)
+- Vite
+- Tailwind CSS
+- jsPDF for client-side PDF generation
+- Vitest + React Testing Library
 
 ## Commands
 
@@ -20,23 +43,39 @@ pnpm build     # production build
 pnpm preview   # preview production build
 pnpm test      # run Vitest in watch mode
 pnpm test:run  # run Vitest once
+pnpm test:e2e:install  # install the local Chromium runtime for Playwright
+pnpm test:e2e  # run Playwright smoke tests
 ```
 
-## Contributor conventions
+Playwright local setup:
 
-- Use Conventional Commit style for git commit messages, for example `feat: ...`, `fix: ...`, `refactor: ...`.
+```bash
+pnpm install
+pnpm test:e2e:install
+pnpm test:e2e
+```
+
+The dev server runs at [http://localhost:5173](http://localhost:5173) by default.
 
 ## Project layout
 
-- `src/data/` — Thai consonants, vowels, sheet options (constants + unit tests)
-- `src/hooks/` — `useContentSelection` (selection state)
-- `src/components/` — ContentSelection, SheetOptions, Preview, OutputActions
-- `src/App.tsx` — single-page composition with lifted state
+- `src/App.tsx` wires together app state, preview, toast messaging, and PDF export flow
+- `src/components/` contains the main UI sections: selection, options, preview, and output actions
+- `src/data/` contains Thai character data, presets, and sheet configuration helpers
+- `src/hooks/` contains `useContentSelection`
+- `src/pdf/` contains PDF layout and font registration logic
+- `public/fonts/` contains the Thai fonts embedded into exported PDFs
+- `docs/` contains planning notes plus current-state documentation
 
-## TDD flow used
+## Testing
 
-1. **Red** — Write a failing test for the next behavior.
-2. **Green** — Implement the minimum code to pass.
-3. **Refactor** — Tidy without changing behavior; keep tests green.
+`pnpm test:run` executes the current unit and component suite. The repository does not currently include Playwright or any E2E test setup.
 
-Tests were written first (or in lockstep) for data, hooks, and components so the suite documents and guards behavior.
+## Contributor conventions
+
+- Use Conventional Commits, for example `feat: ...`, `fix: ...`, or `refactor: ...`
+- Treat the docs in [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md) as the source of truth for shipped behavior
+
+## TDD notes
+
+The implementation follows a Red → Green → Refactor workflow. Historical notes about that process live in [docs/TDD_APPROACH.md](docs/TDD_APPROACH.md) and [docs/MVP_TASKS_TDD.md](docs/MVP_TASKS_TDD.md).

@@ -1,5 +1,7 @@
 # MVP task breakdown (TDD)
 
+> Historical planning document. This checklist tracks the original MVP plan and now diverges from the implemented app in a few areas. For the current product state, see [CURRENT_STATE.md](./CURRENT_STATE.md).
+
 Small chunks for Test-Driven Development. Each task follows **Red** (write failing test) → **Green** (minimal code to pass) → **Refactor** (clean up). This doc maps to [PRD_01_MVP.md](./PRD_01_MVP.md).
 
 ---

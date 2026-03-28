@@ -1,4 +1,3 @@
-import { useEffect, useId, useRef, useState } from 'react'
 import { useContentSelection } from '../hooks/useContentSelection'
 import {
   CONSONANT_GROUP_COLOR_CLASSES,
@@ -17,6 +16,8 @@ import {
   type ThaiVowelPreset,
 } from '../data/vowels'
 import { VowelDisplay } from './VowelDisplay'
+import { PresetMenu } from './PresetMenu'
+import { ContentSelectionSection } from './ContentSelectionSection'
 
 export interface ContentSelectionProps {
   selectedConsonantIds?: string[]
@@ -34,12 +35,6 @@ export interface ContentSelectionProps {
 
 export function ContentSelection(props: ContentSelectionProps = {}) {
   const hook = useContentSelection()
-  const [isConsonantPresetMenuOpen, setIsConsonantPresetMenuOpen] = useState(false)
-  const [isVowelPresetMenuOpen, setIsVowelPresetMenuOpen] = useState(false)
-  const consonantPresetMenuRef = useRef<HTMLDivElement>(null)
-  const vowelPresetMenuRef = useRef<HTMLDivElement>(null)
-  const consonantPresetListboxId = useId()
-  const vowelPresetListboxId = useId()
   const selectedConsonantIds = props.selectedConsonantIds ?? hook.selectedConsonantIds
   const selectedVowelIds = props.selectedVowelIds ?? hook.selectedVowelIds
   const toggleConsonant = props.onToggleConsonant ?? hook.toggleConsonant
@@ -58,50 +53,6 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
   const exactConsonantPreset = getConsonantExactMatchPreset(selectedConsonantIds)
   const vowelPresetTriggerLabel = getVowelPresetTriggerLabel(selectedVowelIds)
 
-  useEffect(() => {
-    if (!isConsonantPresetMenuOpen) return
-
-    const handlePointerDown = (event: MouseEvent) => {
-      if (!consonantPresetMenuRef.current?.contains(event.target as Node)) {
-        setIsConsonantPresetMenuOpen(false)
-      }
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsConsonantPresetMenuOpen(false)
-    }
-
-    document.addEventListener('mousedown', handlePointerDown)
-    document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown)
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [isConsonantPresetMenuOpen])
-
-  useEffect(() => {
-    if (!isVowelPresetMenuOpen) return
-
-    const handlePointerDown = (event: MouseEvent) => {
-      if (!vowelPresetMenuRef.current?.contains(event.target as Node)) {
-        setIsVowelPresetMenuOpen(false)
-      }
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsVowelPresetMenuOpen(false)
-    }
-
-    document.addEventListener('mousedown', handlePointerDown)
-    document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown)
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [isVowelPresetMenuOpen])
-
   const consonantTriggerClasses = exactConsonantPreset
     ? CONSONANT_GROUP_COLOR_CLASSES[exactConsonantPreset.colorKey].trigger
     : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
@@ -112,96 +63,56 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
         {selectedConsonantIds.length} consonants, {selectedVowelIds.length} vowels selected
       </p>
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <div className="mb-5 grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-start">
-          <div className="text-center md:text-left">
-            <h2 className="text-lg font-bold text-gray-900">Select Consonants</h2>
-            <p className="text-[11px] font-semibold tracking-widest text-gray-400 uppercase mt-1">
-              {consonantSet.size} of {THAI_CONSONANTS.length} selected
-            </p>
-          </div>
-          <div className="flex justify-center">
-            <div className="relative" ref={consonantPresetMenuRef}>
-              <button
-                type="button"
-                aria-label="Consonant presets"
-                aria-haspopup="listbox"
-                aria-expanded={isConsonantPresetMenuOpen}
-                aria-controls={consonantPresetListboxId}
-                onClick={() => setIsConsonantPresetMenuOpen((open) => !open)}
-                className={`inline-flex min-w-32 items-center justify-between gap-3 rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm transition-colors ${consonantTriggerClasses}`}
-              >
-                <span title={consonantPresetTriggerLabel === 'Custom' ? 'Custom selection' : consonantPresetTriggerLabel}>
-                  {consonantPresetTriggerLabel}
-                </span>
-                <span aria-hidden="true" className="text-xs text-gray-400">
-                  ▾
-                </span>
-              </button>
+      <ContentSelectionSection
+        title="Select Consonants"
+        countSummary={`${consonantSet.size} of ${THAI_CONSONANTS.length} selected`}
+        presetMenu={
+          <PresetMenu
+            triggerAriaLabel="Consonant presets"
+            listboxAriaLabel="Consonant preset options"
+            triggerLabel={consonantPresetTriggerLabel}
+            triggerTitle={
+              consonantPresetTriggerLabel === 'Custom' ? 'Custom selection' : consonantPresetTriggerLabel
+            }
+            triggerClassName={`inline-flex min-w-32 items-center justify-between gap-3 rounded-lg border px-3 py-1.5 text-sm font-medium shadow-sm transition-colors ${consonantTriggerClasses}`}
+            items={THAI_CONSONANT_PRESETS}
+            getItemKey={(preset) => preset.id}
+            isItemSelected={(preset) => preset.consonantIds.every((id) => consonantSet.has(id))}
+            getItemTitle={(preset) => preset.fullLabel}
+            getOptionClassName={(preset, isSelected) => {
+              const colorClasses = CONSONANT_GROUP_COLOR_CLASSES[preset.colorKey]
+              return `flex w-full items-start justify-between rounded-lg px-3 py-2 text-left transition-colors ${
+                isSelected ? colorClasses.rowActive : colorClasses.rowIdle
+              }`
+            }}
+            renderOptionContent={(preset, isSelected) => {
+              const colorClasses = CONSONANT_GROUP_COLOR_CLASSES[preset.colorKey]
 
-              {isConsonantPresetMenuOpen ? (
-                <div
-                  id={consonantPresetListboxId}
-                  role="listbox"
-                  aria-label="Consonant preset options"
-                  aria-multiselectable="true"
-                  className="absolute left-1/2 top-full z-10 mt-2 w-64 -translate-x-1/2 rounded-xl border border-gray-200 bg-white p-2 shadow-lg"
-                >
-                  {THAI_CONSONANT_PRESETS.map((preset) => {
-                    const isApplied = preset.consonantIds.every((id) => consonantSet.has(id))
-                    const colorClasses = CONSONANT_GROUP_COLOR_CLASSES[preset.colorKey]
-
-                    return (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        role="option"
-                        aria-selected={isApplied}
-                        title={preset.fullLabel}
-                        onClick={() => {
-                          applyConsonantPreset(preset.id)
-                          setIsConsonantPresetMenuOpen(false)
-                        }}
-                        className={`flex w-full items-start justify-between rounded-lg px-3 py-2 text-left transition-colors ${
-                          isApplied ? colorClasses.rowActive : colorClasses.rowIdle
-                        }`}
-                      >
-                        <span>
-                          <span className="block text-sm font-semibold">{preset.shortLabel}</span>
-                          <span className={`block text-xs ${colorClasses.rowMeta}`}>{preset.fullLabel}</span>
-                        </span>
-                        <span
-                          aria-hidden="true"
-                          className={`mt-0.5 text-xs ${isApplied ? colorClasses.check : 'text-gray-300'}`}
-                        >
-                          {isApplied ? '✓' : ''}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-              ) : null}
-            </div>
-          </div>
-          <div className="flex justify-center gap-2 md:justify-end">
-            <button
-              type="button"
-              onClick={selectAllConsonants}
-              aria-label="Select all consonants"
-              className="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Select All
-            </button>
-            <button
-              type="button"
-              onClick={clearConsonants}
-              aria-label="Clear consonants"
-              className="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
+              return (
+                <>
+                  <span>
+                    <span className="block text-sm font-semibold">{preset.shortLabel}</span>
+                    <span className={`block text-xs ${colorClasses.rowMeta}`}>{preset.fullLabel}</span>
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className={`mt-0.5 text-xs ${isSelected ? colorClasses.check : 'text-gray-300'}`}
+                  >
+                    {isSelected ? '✓' : ''}
+                  </span>
+                </>
+              )
+            }}
+            onSelect={(preset) => {
+              applyConsonantPreset(preset.id)
+            }}
+          />
+        }
+        selectAllAriaLabel="Select all consonants"
+        clearAriaLabel="Clear consonants"
+        onSelectAll={selectAllConsonants}
+        onClear={clearConsonants}
+      >
         <div
           className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(55px,1fr))] md:[grid-template-columns:repeat(10,minmax(0,1fr))]"
           data-consonant-grid="true"
@@ -247,97 +158,51 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
             )
           })}
         </div>
-      </div>
+      </ContentSelectionSection>
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <div className="mb-5 grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-start">
-          <div className="text-center md:text-left">
-            <h2 className="text-lg font-bold text-gray-900">Select Vowels</h2>
-            <p className="text-[11px] font-semibold tracking-widest text-gray-400 uppercase mt-1">
-              {vowelSet.size} of {THAI_VOWELS.length} selected
-            </p>
-          </div>
-          <div className="flex justify-center">
-            <div className="relative" ref={vowelPresetMenuRef}>
-              <button
-                type="button"
-                aria-label="Vowel presets"
-                aria-haspopup="listbox"
-                aria-expanded={isVowelPresetMenuOpen}
-                aria-controls={vowelPresetListboxId}
-                onClick={() => setIsVowelPresetMenuOpen((open) => !open)}
-                className="inline-flex min-w-32 items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
-              >
-                <span title={vowelPresetTriggerLabel === 'Custom' ? 'Custom selection' : vowelPresetTriggerLabel}>
-                  {vowelPresetTriggerLabel}
+      <ContentSelectionSection
+        title="Select Vowels"
+        countSummary={`${vowelSet.size} of ${THAI_VOWELS.length} selected`}
+        presetMenu={
+          <PresetMenu
+            triggerAriaLabel="Vowel presets"
+            listboxAriaLabel="Vowel preset options"
+            triggerLabel={vowelPresetTriggerLabel}
+            triggerTitle={vowelPresetTriggerLabel === 'Custom' ? 'Custom selection' : vowelPresetTriggerLabel}
+            triggerClassName="inline-flex min-w-32 items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+            items={THAI_VOWEL_PRESETS}
+            getItemKey={(preset) => preset.id}
+            isItemSelected={(preset) => preset.vowelIds.every((id) => vowelSet.has(id))}
+            getItemTitle={(preset) => preset.fullLabel}
+            getOptionClassName={(_, isSelected) =>
+              `flex w-full items-start justify-between rounded-lg px-3 py-2 text-left transition-colors ${
+                isSelected ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50'
+              }`
+            }
+            renderOptionContent={(preset, isSelected) => (
+              <>
+                <span>
+                  <span className="block text-sm font-semibold">{preset.shortLabel}</span>
+                  <span className="block text-xs text-gray-400">{preset.fullLabel}</span>
                 </span>
-                <span aria-hidden="true" className="text-xs text-gray-400">
-                  ▾
-                </span>
-              </button>
-
-              {isVowelPresetMenuOpen ? (
-                <div
-                  id={vowelPresetListboxId}
-                  role="listbox"
-                  aria-label="Vowel preset options"
-                  aria-multiselectable="true"
-                  className="absolute left-1/2 top-full z-10 mt-2 w-64 -translate-x-1/2 rounded-xl border border-gray-200 bg-white p-2 shadow-lg"
+                <span
+                  aria-hidden="true"
+                  className={`mt-0.5 text-xs ${isSelected ? 'text-indigo-500' : 'text-gray-300'}`}
                 >
-                  {THAI_VOWEL_PRESETS.map((preset) => {
-                    const isApplied = preset.vowelIds.every((id) => vowelSet.has(id))
-
-                    return (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        role="option"
-                        aria-selected={isApplied}
-                        title={preset.fullLabel}
-                        onClick={() => {
-                          applyVowelPreset(preset.id)
-                          setIsVowelPresetMenuOpen(false)
-                        }}
-                        className={`flex w-full items-start justify-between rounded-lg px-3 py-2 text-left transition-colors ${
-                          isApplied ? 'bg-indigo-50 text-indigo-700' : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        <span>
-                          <span className="block text-sm font-semibold">{preset.shortLabel}</span>
-                          <span className="block text-xs text-gray-400">{preset.fullLabel}</span>
-                        </span>
-                        <span
-                          aria-hidden="true"
-                          className={`mt-0.5 text-xs ${isApplied ? 'text-indigo-500' : 'text-gray-300'}`}
-                        >
-                          {isApplied ? '✓' : ''}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-              ) : null}
-            </div>
-          </div>
-          <div className="flex justify-center gap-2 md:justify-end">
-            <button
-              type="button"
-              onClick={selectAllVowels}
-              aria-label="Select all vowels"
-              className="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Select All
-            </button>
-            <button
-              type="button"
-              onClick={clearVowels}
-              aria-label="Clear vowels"
-              className="px-3 py-1.5 text-sm font-medium border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
+                  {isSelected ? '✓' : ''}
+                </span>
+              </>
+            )}
+            onSelect={(preset) => {
+              applyVowelPreset(preset.id)
+            }}
+          />
+        }
+        selectAllAriaLabel="Select all vowels"
+        clearAriaLabel="Clear vowels"
+        onSelectAll={selectAllVowels}
+        onClear={clearVowels}
+      >
         <div
           className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(5.5rem,1fr))] md:[grid-template-columns:repeat(10,minmax(0,1fr))]"
           data-vowel-grid="true"
@@ -360,7 +225,7 @@ export function ContentSelection(props: ContentSelectionProps = {}) {
             </button>
           ))}
         </div>
-      </div>
+      </ContentSelectionSection>
     </section>
   )
 }

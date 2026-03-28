@@ -7,9 +7,11 @@ import {
   FONT_SIZE_OPTIONS,
   GHOST_COPIES_OPTIONS,
   DEFAULT_SHEET_CONFIG,
+  getSheetConfigClampNotice,
   getAllowedColumnOptions,
   getInitialColumnsForWidth,
   getMaxColumnsForFontSize,
+  normalizeSheetConfig,
   type SheetConfig,
 } from './sheetOptions'
 
@@ -108,6 +110,53 @@ describe('COLUMNS_OPTIONS', () => {
     expect(getInitialColumnsForWidth('medium', 120)).toBe(3)
     expect(getInitialColumnsForWidth('medium', 500)).toBe(6)
     expect(getInitialColumnsForWidth('medium', 1200)).toBe(9)
+  })
+
+  it('normalizes columns and ghost copies to the font-size limit', () => {
+    expect(
+      normalizeSheetConfig({
+        ...DEFAULT_SHEET_CONFIG,
+        fontSize: 'large',
+        columns: 12,
+        ghostCopiesPerRow: 10,
+      })
+    ).toEqual({
+      ...DEFAULT_SHEET_CONFIG,
+      fontSize: 'large',
+      columns: 7,
+      ghostCopiesPerRow: 7,
+    })
+  })
+
+  it('describes a forced column clamp after a font-size change', () => {
+    const previousConfig: SheetConfig = {
+      ...DEFAULT_SHEET_CONFIG,
+      fontSize: 'small',
+      columns: 12,
+      ghostCopiesPerRow: 8,
+    }
+    const nextConfig = normalizeSheetConfig({
+      ...previousConfig,
+      fontSize: 'large',
+    })
+
+    expect(getSheetConfigClampNotice(previousConfig, nextConfig)).toBe(
+      'Adjusted to 7 columns so it fits on the page.'
+    )
+  })
+
+  it('does not show a clamp notice when font size does not change', () => {
+    const previousConfig: SheetConfig = {
+      ...DEFAULT_SHEET_CONFIG,
+      fontSize: 'medium',
+      columns: 9,
+    }
+    const nextConfig = normalizeSheetConfig({
+      ...previousConfig,
+      ghostCopiesPerRow: 12,
+    })
+
+    expect(getSheetConfigClampNotice(previousConfig, nextConfig)).toBeNull()
   })
 })
 
