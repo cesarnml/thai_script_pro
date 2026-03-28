@@ -175,7 +175,7 @@ export function Preview({
   })
 
   return (
-    <section role="region" aria-label="Preview" className="min-h-[200px]">
+    <section aria-label="Preview" className="min-h-[200px]">
       {totalChars === 0 ? (
         <div
           className="bg-white rounded-2xl p-12 text-center"

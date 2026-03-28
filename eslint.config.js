@@ -1,6 +1,7 @@
 import js from '@eslint/js'
 import globals from 'globals'
 import eslintConfigPrettier from 'eslint-config-prettier'
+import jsxA11y from 'eslint-plugin-jsx-a11y'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
@@ -36,6 +37,10 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
     },
+  },
+  {
+    files: ['**/*.{jsx,tsx}'],
+    extends: [jsxA11y.flatConfigs.recommended],
   },
   {
     files: ['**/*.{config,test,spec}.{js,jsx,ts,tsx}', 'e2e/**/*.ts'],
